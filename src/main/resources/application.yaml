@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: ${SYSTEM_DB_URL}
+    username: ${SYSTEM_DB_USERNAME}
+    password: ${SYSTEM_DB_PASSWORD}
+  liquibase:
+    change-log: db/changelog/changelog-master.yaml
