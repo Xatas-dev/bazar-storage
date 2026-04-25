@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 public enum ErrorCode {
-    TECH_ERROR(HttpStatus.CONFLICT, "Technical error");
+    TECH_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "Technical error");
 
     @Getter
     private final HttpStatus status;

@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import java.util.List;
 
-// TODO: подумать над добавлением общего класса ошибки NodeValidationException, чтобы потом можно было удобнее валидировать папки
+// TODO: подумать над добавлением общего класса ошибки NodeValidationException, чтобы потом можно было удобнее валидировать папки. Будет реализовано в рамках стори https://grinbog015.atlassian.net/browse/BZR-104
 @Getter
 public class FileValidationException extends RuntimeException {
     private final List<String> validationErrors;

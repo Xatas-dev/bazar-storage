@@ -37,7 +37,7 @@ public class GetUploadUrlUseCase implements GetUploadUrlInbound {
 
     @Override
     public UploadUrlInfo execute(GetUploadUrlCommand command) {
-        // TODO: интеграция с auth
+        // TODO: интеграция с auth. Сделать в рамках https://grinbog015.atlassian.net/browse/BZR-103
         List<String> validationErrors = validateFile(command);
         if (!validationErrors.isEmpty()) {
             log.error("Validation errors: {}", validationErrors);
@@ -56,7 +56,7 @@ public class GetUploadUrlUseCase implements GetUploadUrlInbound {
     // = Implementation
     // =================================================================================================================
 
-    // TODO: подумать над вынесением в отдельный класс с последующим расширением под валидацию папок
+    // TODO: подумать над вынесением в отдельный класс с последующим расширением под валидацию папок. Будет реализовано в рамках стори https://grinbog015.atlassian.net/browse/BZR-104
     private List<String> validateFile(GetUploadUrlCommand command) {
         List<String> validationErrors = new ArrayList<>();
         Long maxFileSize = settingProperties.getFileValidation().getMaxFileSize();
