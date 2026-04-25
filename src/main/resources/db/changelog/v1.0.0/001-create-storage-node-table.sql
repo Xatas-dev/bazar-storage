@@ -7,7 +7,6 @@ CREATE TABLE storage_node (
     type VARCHAR NOT NULL,
     parent_id BIGINT REFERENCES storage_node(id),
     size BIGINT,
-    content_type TEXT,
     user_id UUID NOT NULL,
     created_at timestamp with time zone not null default now(),
     updated_at timestamp with time zone not null default now()

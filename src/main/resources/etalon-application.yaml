@@ -5,3 +5,19 @@ spring:
     url: jdbc:postgresql://localhost:5432/bazar_storage
     username: ${DB_USER:postgres}
     password: ${DB_PASS:postgres}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8085/realms/local
+
+settings:
+  file-validation:
+    max-file-size: 52428800
+    not-allowed-extensions: [exe, sh, bat, msi, bin, ps1, hta]
+    max-file-name-length: 100
+
+service:
+  bazar-files:
+    url: http://localhost:${service.bazar-files.port}/api
+    port: 8081

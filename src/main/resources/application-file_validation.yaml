@@ -1,0 +1,6 @@
+settings:
+  file-validation:
+    error-messages:
+      FILE_TOO_LARGE: "Размер файла не может превышать %d байт"
+      FILE_EXTENSION_NOT_ALLOWED: "Невозможно загрузить файл с расширением %s"
+      FILE_NAME_TOO_LARGE: "Длина имени файла не может превышать %d символов"

@@ -1,7 +1,31 @@
 spring:
+  profiles:
+    include: file_validation
   datasource:
     url: ${SYSTEM_DB_URL}
     username: ${SYSTEM_DB_USERNAME}
     password: ${SYSTEM_DB_PASSWORD}
   liquibase:
     change-log: db/changelog/changelog-master.yaml
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${INTEGRATION_KEYCLOAK_EXTERNAL_URL}/realms/${INTEGRATION_KEYCLOAK_REALM}
+
+management:
+  server:
+    port: 8090
+
+server:
+  port: 8080
+
+service:
+  bazar-files:
+    url: ${INTEGRATION_REST_BAZAR_FILES_API_URL}
+
+settings:
+  file-validation:
+    max-file-size: ${SETTING_MAX_FILE_SIZE}
+    not-allowed-extensions: ${SETTING_NOT_ALLOWED_EXTENSIONS}
+    max-file-name-length: ${SETTING_MAX_FILE_NAME_LENGTH}

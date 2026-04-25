@@ -43,9 +43,6 @@ public class StorageNode extends DomainObject {
     @Column(name = "size")
     private Long size;
 
-    @Column(name = "content_type")
-    private String contentType;
-
     @Column(name = "user_id")
     private UUID userId;
 }
