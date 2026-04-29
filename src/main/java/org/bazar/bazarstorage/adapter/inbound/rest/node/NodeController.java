@@ -1,15 +1,19 @@
 package org.bazar.bazarstorage.adapter.inbound.rest.node;
 
 import lombok.RequiredArgsConstructor;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetDownloadUrlResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlRequest;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
+import org.bazar.bazarstorage.app.api.node.GetDownloadUrlInbound;
 import org.bazar.bazarstorage.app.api.node.GetFileStatusInbound;
 import org.bazar.bazarstorage.app.api.node.GetNodesBySpaceIdInbound;
 import org.bazar.bazarstorage.app.api.node.GetUploadUrlInbound;
 import org.bazar.bazarstorage.app.impl.node.commands.GetNodesBySpaceIdCommand;
 import org.bazar.bazarstorage.app.impl.node.commands.GetUploadUrlCommand;
+import org.bazar.bazarstorage.app.impl.node.output.DownloadUrlInfo;
+import org.bazar.bazarstorage.app.impl.node.output.FileStatusInfo;
 import org.bazar.bazarstorage.app.impl.node.output.NodeInfoPage;
 import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +33,7 @@ public class NodeController implements NodeControllerSwagger {
     private final GetUploadUrlInbound getUploadUrlInbound;
     private final GetFileStatusInbound getFileStatusInbound;
     private final GetNodesBySpaceIdInbound getNodesBySpaceIdInbound;
+    private final GetDownloadUrlInbound getDownloadUrlInbound;
 
     @GetMapping("/upload-url")
     public V1GetUploadUrlResponse getUploadUrl(@ModelAttribute V1GetUploadUrlRequest request, @PathVariable String spaceId) {
@@ -40,7 +45,7 @@ public class NodeController implements NodeControllerSwagger {
     // TODO: продумать, нужен ли в методе spaceId, если fileUuid уникальный. Решение или изменения в коде делать в рамках задачи: https://grinbog015.atlassian.net/browse/BZR-112
     @GetMapping("/status")
     public V1GetFileStatusResponse getFileStatus(@RequestParam String fileUuid, @PathVariable String spaceId) {
-        String status = getFileStatusInbound.execute(fileUuid);
+        FileStatusInfo status = getFileStatusInbound.execute(fileUuid);
         return restNodeMapper.toResponse(status);
     }
 
@@ -49,5 +54,11 @@ public class NodeController implements NodeControllerSwagger {
         GetNodesBySpaceIdCommand command = restNodeMapper.toCommand(spaceId, pageable);
         NodeInfoPage nodeInfoPage = getNodesBySpaceIdInbound.execute(command);
         return restNodeMapper.toResponse(nodeInfoPage);
+    }
+
+    @GetMapping("/url-for-download")
+    public V1GetDownloadUrlResponse getUrlForDownload(@PathVariable String spaceId, @RequestParam String fileUuid) {
+        DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(fileUuid);
+        return restNodeMapper.toResponse(urlInfo);
     }
 }
