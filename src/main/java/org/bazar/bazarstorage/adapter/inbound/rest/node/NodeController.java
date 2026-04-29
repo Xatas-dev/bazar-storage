@@ -14,7 +14,6 @@ import org.bazar.bazarstorage.app.impl.node.output.NodeInfoPage;
 import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"}, allowCredentials = "true")
 public class NodeController implements NodeControllerSwagger {
     private final RestNodeMapper restNodeMapper;
     private final GetUploadUrlInbound getUploadUrlInbound;
