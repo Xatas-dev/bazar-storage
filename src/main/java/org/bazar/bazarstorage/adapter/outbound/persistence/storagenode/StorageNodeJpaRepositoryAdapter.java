@@ -3,6 +3,9 @@ package org.bazar.bazarstorage.adapter.outbound.persistence.storagenode;
 import lombok.RequiredArgsConstructor;
 import org.bazar.bazarstorage.app.api.node.StorageNodeRepository;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -22,4 +25,10 @@ public class StorageNodeJpaRepositoryAdapter implements StorageNodeRepository {
     public Optional<StorageNode> findByFileUuid(String fileUuid) {
         return storageNodeJpaRepository.findByFileUuid(UUID.fromString(fileUuid));
     }
+
+    @Override
+    public Page<StorageNode> findBySpaceIdAndStatus(Long spaceId, StorageNodeStatus status, Pageable pageable) {
+        return storageNodeJpaRepository.findBySpaceIdAndStatus(spaceId, status, pageable);
+    }
+
 }
