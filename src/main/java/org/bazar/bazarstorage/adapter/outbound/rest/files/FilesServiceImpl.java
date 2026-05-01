@@ -34,7 +34,17 @@ public class FilesServiceImpl implements FilesService {
             );
             return mapper.toUploadUrlInfo(response);
         } catch (FeignException e) {
-            log.error("Error while calling files service: status {}, message {}", e.status(), e.getMessage());
+            log.error("Error while calling files service to initiate upload: status {}, message {}", e.status(), e.getMessage());
+            throw new BusinessException(ErrorCode.TECH_ERROR);
+        }
+    }
+
+    @Override
+    public String initiateDownload(String fileUuid) {
+        try {
+            return feignClient.initiateDownload(fileUuid).downloadUrl();
+        } catch (FeignException e) {
+            log.error("Error while calling files service to initiate download: status {}, message {}", e.status(), e.getMessage());
             throw new BusinessException(ErrorCode.TECH_ERROR);
         }
     }

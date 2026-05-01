@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetDownloadUrlResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlRequest;
@@ -30,4 +31,10 @@ public interface NodeControllerSwagger {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = V1GetNodesPaginationResponse.class)))
     @ApiResponse(responseCode = "400", description = "Некорректный запрос")
     V1GetNodesPaginationResponse getNodes(String spaceId, @ParameterObject Pageable pageable);
+
+    @Operation(summary = "Получить URL для скачивания файла", description = "Возвращает URL для скачивания файла")
+    @ApiResponse(responseCode = "200", description = "Успешный ответ",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = V1GetNodesPaginationResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Некорректный запрос")
+    V1GetDownloadUrlResponse getUrlForDownload(String spaceId, @Parameter String fileUuid);
 }

@@ -5,4 +5,6 @@ import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
 
 public interface FilesService {
     UploadUrlInfo initiateUpload(GetUploadUrlCommand command);
+
+    String initiateDownload(String fileUuid);
 }

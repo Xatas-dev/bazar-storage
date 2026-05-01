@@ -1,5 +1,6 @@
 package org.bazar.bazarstorage.adapter.outbound.rest.files;
 
+import org.bazar.bazarstorage.adapter.outbound.rest.files.dto.V1InitiateDownloadResponseDto;
 import org.bazar.bazarstorage.adapter.outbound.rest.files.dto.V1InitiateUploadResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,4 +13,7 @@ public interface FilesFeignClient {
                                                @RequestParam Long size,
                                                @RequestParam String contentType,
                                                @RequestParam String domain);
+
+    @GetMapping("/v1/files/initiate-download")
+    V1InitiateDownloadResponseDto initiateDownload(@RequestParam String fileUuid);
 }
