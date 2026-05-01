@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/spaces/{spaceId}/nodes")
 @RequiredArgsConstructor
 public class NodeController implements NodeControllerSwagger {
     private final RestNodeMapper restNodeMapper;
@@ -30,20 +30,21 @@ public class NodeController implements NodeControllerSwagger {
     private final GetFileStatusInbound getFileStatusInbound;
     private final GetNodesBySpaceIdInbound getNodesBySpaceIdInbound;
 
-    @GetMapping("/nodes/upload-url")
-    public V1GetUploadUrlResponse getUploadUrl(@ModelAttribute V1GetUploadUrlRequest request) {
+    @GetMapping("/upload-url")
+    public V1GetUploadUrlResponse getUploadUrl(@ModelAttribute V1GetUploadUrlRequest request, @PathVariable String spaceId) {
         GetUploadUrlCommand command = restNodeMapper.toCommand(request);
         UploadUrlInfo urlInfo = getUploadUrlInbound.execute(command);
         return restNodeMapper.toResponse(urlInfo);
     }
 
-    @GetMapping("/nodes/status")
-    public V1GetFileStatusResponse getFileStatus(@RequestParam String fileUuid) {
+    // TODO: продумать, нужен ли в методе spaceId, если fileUuid уникальный. Решение или изменения в коде делать в рамках задачи: https://grinbog015.atlassian.net/browse/BZR-112
+    @GetMapping("/status")
+    public V1GetFileStatusResponse getFileStatus(@RequestParam String fileUuid, @PathVariable String spaceId) {
         String status = getFileStatusInbound.execute(fileUuid);
         return restNodeMapper.toResponse(status);
     }
 
-    @GetMapping("/spaces/{spaceId}/nodes")
+    @GetMapping
     public V1GetNodesPaginationResponse getNodes(@PathVariable String spaceId, @PageableDefault(size = 20) Pageable pageable) {
         GetNodesBySpaceIdCommand command = restNodeMapper.toCommand(spaceId, pageable);
         NodeInfoPage nodeInfoPage = getNodesBySpaceIdInbound.execute(command);

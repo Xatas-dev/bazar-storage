@@ -34,10 +34,10 @@ public class PersonaServiceImpl implements PersonaService {
 
     private List<User> getUsersUsingCache(List<UUID> userIds) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(CaffeineCacheConfig.PERSONA_USER_CACHE));
+        CollectedUsers collected = collectCachedAndMissingUsers(cache, userIds);
 
-        Map<UUID, User> result = new HashMap<>();
-        List<UUID> missingUserIds = new ArrayList<>();
-        collectCachedAndMissingUsers(cache, userIds, result, missingUserIds);
+        Map<UUID, User> result = new HashMap<>(collected.found());
+        List<UUID> missingUserIds = collected.missing();
 
         List<GetUserResponseDto> missingUsers = getUsersFromFeignClient(missingUserIds);
         processMissingUsers(missingUsers, result, cache);
@@ -47,15 +47,23 @@ public class PersonaServiceImpl implements PersonaService {
                 .toList();
     }
 
-    private void collectCachedAndMissingUsers(Cache cache, List<UUID> userIds, Map<UUID, User> result, List<UUID> missingUserIds) {
-        userIds.forEach(userId -> {
-            User userDto = cache.get(userId, User.class);
-            if (userDto != null) {
-                result.put(userId, userDto);
+    private CollectedUsers collectCachedAndMissingUsers(Cache cache, List<UUID> userIds) {
+        Map<UUID, User> found = new HashMap<>();
+        List<UUID> missing = new ArrayList<>();
+
+        for (UUID userId : userIds) {
+            User user = cache.get(userId, User.class);
+            if (user != null) {
+                found.put(userId, user);
             } else {
-                missingUserIds.add(userId);
+                missing.add(userId);
             }
-        });
+        }
+
+        return new CollectedUsers(
+                Map.copyOf(found),
+                List.copyOf(missing)
+        );
     }
 
     private void processMissingUsers(List<GetUserResponseDto> missingUsers, Map<UUID, User> result, Cache cache) {
