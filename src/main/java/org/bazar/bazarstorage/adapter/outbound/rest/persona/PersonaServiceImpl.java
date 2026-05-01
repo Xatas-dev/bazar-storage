@@ -81,4 +81,9 @@ public class PersonaServiceImpl implements PersonaService {
         }
         return List.of();
     }
+
+    private record CollectedUsers(
+            Map<UUID, User> found,
+            List<UUID> missing
+    ) {}
 }
