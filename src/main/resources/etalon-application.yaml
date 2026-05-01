@@ -23,3 +23,6 @@ service:
   bazar-files:
     url: http://localhost:${service.bazar-files.port}/api
     port: 8081
+  bazar-persona:
+    url: http://localhost:${service.bazar-persona.port}/api
+    port: 8082

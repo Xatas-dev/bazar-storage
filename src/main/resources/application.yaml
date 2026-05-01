@@ -35,6 +35,8 @@ kafka:
 service:
   bazar-files:
     url: ${INTEGRATION_REST_BAZAR_FILES_API_URL}
+  bazar-persona:
+    url: ${INTEGRATION_REST_BAZAR_PERSONA_API_URL}
 
 settings:
   file-validation:

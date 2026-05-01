@@ -8,8 +8,5 @@ public record V1GetUploadUrlRequest(
         String fileName,
 
         @Schema(description = "Размер файла")
-        Long size,
-
-        @Schema(description = "Идентификатор пространства")
-        String spaceId
+        Long size
 ) {}
