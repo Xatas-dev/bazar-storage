@@ -16,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 
 @Mapper
 public interface RestNodeMapper {
-    GetUploadUrlCommand toCommand(V1GetUploadUrlRequest request);
+    GetUploadUrlCommand toCommand(V1GetUploadUrlRequest request, String spaceId);
 
     GetNodesBySpaceIdCommand toCommand(String spaceId, Pageable pageable);
 

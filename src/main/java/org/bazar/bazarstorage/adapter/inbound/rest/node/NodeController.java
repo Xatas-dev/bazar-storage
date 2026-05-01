@@ -37,7 +37,7 @@ public class NodeController implements NodeControllerSwagger {
 
     @GetMapping("/upload-url")
     public V1GetUploadUrlResponse getUploadUrl(@ModelAttribute V1GetUploadUrlRequest request, @PathVariable String spaceId) {
-        GetUploadUrlCommand command = restNodeMapper.toCommand(request);
+        GetUploadUrlCommand command = restNodeMapper.toCommand(request, spaceId);
         UploadUrlInfo urlInfo = getUploadUrlInbound.execute(command);
         return restNodeMapper.toResponse(urlInfo);
     }
