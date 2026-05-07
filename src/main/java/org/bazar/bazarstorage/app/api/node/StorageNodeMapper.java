@@ -44,7 +44,8 @@ public interface StorageNodeMapper {
         );
     }
 
-    FileStatusInfo toFileStatusInfo(String status);
+    @Mapping(target = "author", expression = "java(toAuthorInfo(user, authorStatus))")
+    FileStatusInfo toFileStatusInfo(String status, User user, AuthorStatus authorStatus);
 
     DownloadUrlInfo toDownloadUrlInfo(String downloadUrl);
 }

@@ -7,6 +7,7 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusRespo
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
+import org.bazar.bazarstorage.app.impl.node.output.AuthorStatus;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,6 +89,8 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @DisplayName("Получение статуса файла")
     void getFileStatus_success() throws Exception {
         StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.UPLOADED);
+        wireMockTestHelper.stubBazarPersonaGetUsers_200(
+                List.of(JwtBuilder.TEST_USER_ID), "/NodeControllerIntegrationTest/PersonaGetUsersResponse.json");
 
         V1GetFileStatusResponse result = restTestUtil.getPerform(
                 String.format(GET_STATUS_API_URL, SPACE_ID),
@@ -98,6 +101,8 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
         );
 
         assertEquals(StorageNodeStatus.UPLOADED.name(), result.status());
+        assertNotNull(result.author());
+        assertEquals(AuthorStatus.EXIST.name(), result.author().status());
     }
 
     @Test
