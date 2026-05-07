@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -31,6 +32,13 @@ public class PersonaServiceImpl implements PersonaService {
     @Override
     public List<User> getUsersByIds(List<UUID> userIds) {
         return getUsersUsingCache(userIds);
+    }
+
+    @Override
+    public Optional<User> getUserById(UUID userId) {
+        return getUsersUsingCache(List.of(userId)).stream()
+                .filter(user -> user.getUserId().equals(userId))
+                .findFirst();
     }
 
     // =================================================================================================================

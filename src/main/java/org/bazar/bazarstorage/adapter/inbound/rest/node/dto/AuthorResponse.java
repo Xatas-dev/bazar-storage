@@ -1,6 +1,6 @@
 package org.bazar.bazarstorage.adapter.inbound.rest.node.dto;
 
-public record V1GetNodesAuthorResponse(
+public record AuthorResponse(
         String firstName,
         String lastName,
         String status

@@ -6,6 +6,6 @@ public record V1GetNodesResponse(
         Long size,
         String type,
         String uploadedAt,
-        V1GetNodesAuthorResponse author
+        AuthorResponse author
 ) {
 }
