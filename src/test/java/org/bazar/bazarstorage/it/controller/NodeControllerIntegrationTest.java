@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -86,8 +87,8 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     }
 
     @Test
-    @DisplayName("Получение статуса файла")
-    void getFileStatus_success() throws Exception {
+    @DisplayName("Получение статуса загруженного файла")
+    void getFileStatus_success_UPLOADED() throws Exception {
         StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.UPLOADED);
         wireMockTestHelper.stubBazarPersonaGetUsers_200(
                 List.of(JwtBuilder.TEST_USER_ID), "/NodeControllerIntegrationTest/PersonaGetUsersResponse.json");
@@ -103,6 +104,23 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
         assertEquals(StorageNodeStatus.UPLOADED.name(), result.status());
         assertNotNull(result.author());
         assertEquals(AuthorStatus.EXIST.name(), result.author().status());
+    }
+
+    @Test
+    @DisplayName("Получение статуса файла в процессе")
+    void getFileStatus_success_IN_PROGRESS() throws Exception {
+        StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.IN_PROGRESS);
+
+        V1GetFileStatusResponse result = restTestUtil.getPerform(
+                String.format(GET_STATUS_API_URL, SPACE_ID),
+                Map.of("fileUuid", storageNode.getFileUuid()),
+                TYPE_REF_V1_GET_FILE_STATUS_RESPONSE,
+                Map.of(),
+                status().isOk()
+        );
+
+        assertEquals(StorageNodeStatus.IN_PROGRESS.name(), result.status());
+        assertNull(result.author());
     }
 
     @Test

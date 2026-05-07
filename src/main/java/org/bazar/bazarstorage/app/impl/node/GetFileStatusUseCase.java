@@ -9,6 +9,7 @@ import org.bazar.bazarstorage.app.api.persona.PersonaService;
 import org.bazar.bazarstorage.app.impl.node.output.AuthorStatus;
 import org.bazar.bazarstorage.app.impl.node.output.FileStatusInfo;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.bazar.bazarstorage.domain.user.User;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,10 @@ public class GetFileStatusUseCase implements GetFileStatusInbound {
     public FileStatusInfo execute(String fileUuid) {
         StorageNode storageNode = storageNodeRepository.findByFileUuid(fileUuid)
                 .orElseThrow(() -> new BusinessException(STORAGE_NODE_NOT_FOUND_BY_FILE_UUID, fileUuid));
+        if (StorageNodeStatus.IN_PROGRESS == storageNode.getStatus()) {
+            return storageNodeMapper.toFileStatusInfo(storageNode.getStatus().name());
+        }
+
         User user = personaService.getUserById(storageNode.getUserId()).orElse(null);
         return storageNodeMapper.toFileStatusInfo(storageNode.getStatus().name(), user, AuthorStatus.from(user));
     }
