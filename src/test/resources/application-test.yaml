@@ -1,0 +1,29 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://realms/test
+  kafka:
+    bootstrap-servers: localhost:9092
+
+service:
+  bazar-files:
+    url: http://localhost:${service.bazar-files.port}/api
+    port: 8081
+  bazar-persona:
+    url: http://localhost:${service.bazar-persona.port}
+    port: 8082
+
+settings:
+  file-validation:
+    max-file-size: 52428800
+    not-allowed-extensions: [exe, sh, bat, msi, bin, ps1, hta]
+    max-file-name-length: 100
