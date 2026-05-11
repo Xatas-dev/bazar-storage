@@ -6,6 +6,7 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetDownloadUrlResp
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesResponse;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlRequest;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
 import org.bazar.bazarstorage.app.impl.node.output.AuthorStatus;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
@@ -29,15 +30,15 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     private static final String VALID_FILE_NAME = "fileName.docx";
     private static final String INVALID_FILE_NAME =
             "fileNamefileNamefileNamefileNamefileNamefileNamefileNamefileNamefileNamefileNamefileNamefileNamefileN.exe";
-    private static final String VALID_SIZE = "5102";
-    private static final String INVALID_SIZE = "13123123123123132";
+    private static final Long VALID_SIZE = 5102L;
+    private static final Long INVALID_SIZE = 13123123123123132L;
     private static final String DOCX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
     private static final String STORAGE_DOMAIN = "STORAGE";
     private static final String FILE_TOO_LARGE_MESSAGE = "Размер файла не может превышать 52428800 байт";
     private static final String FILE_EXTENSION_NOT_ALLOWED_MESSAGE = "Невозможно загрузить файл с расширением %s";
     private static final String FILE_NAME_TOO_LARGE_MESSAGE = "Длина имени файла не может превышать 100 символов";
-    private static final TypeReference<V1GetUploadUrlResponse> TYPE_REF_V1_GET_UPLOAD_URL_RESPONSE = new TypeReference<>() {};
-    private static final TypeReference<List<String>> TYPE_REF_V1_GET_UPLOAD_URL_RESPONSE_VALIDATION_ERROR = new TypeReference<>() {};
+    private static final TypeReference<V1GetUploadUrlResponse> TYPE_REF_V1_POST_UPLOAD_URL_RESPONSE = new TypeReference<>() {};
+    private static final TypeReference<List<String>> TYPE_REF_V1_POST_UPLOAD_URL_RESPONSE_VALIDATION_ERROR = new TypeReference<>() {};
     private static final TypeReference<V1GetFileStatusResponse> TYPE_REF_V1_GET_FILE_STATUS_RESPONSE = new TypeReference<>() {};
     private static final TypeReference<V1GetNodesPaginationResponse> TYPE_REF_V1_GET_NODES_PAGINATION_RESPONSE = new TypeReference<>() {};
     private static final TypeReference<V1GetDownloadUrlResponse> TYPE_REF_V1_GET_DOWNLOAD_URL_RESPONSE = new TypeReference<>() {};
@@ -52,31 +53,31 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @DisplayName("Успешное получение presigned URL для загрузки файла")
     void getUploadUrl_success() throws Exception {
         wireMockTestHelper.stubBazarFilesInitiateUpload_200(
-                VALID_FILE_NAME, VALID_SIZE, DOCX_CONTENT_TYPE, STORAGE_DOMAIN, "/NodeControllerIntegrationTest/V1InitiateUploadResponseDto.json"
+                VALID_FILE_NAME, String.valueOf(VALID_SIZE), DOCX_CONTENT_TYPE, STORAGE_DOMAIN, "/NodeControllerIntegrationTest/V1InitiateUploadResponseDto.json"
         );
 
-        V1GetUploadUrlResponse result = restTestUtil.getPerform(
-                String.format(GET_UPLOAD_URL_API_URL, SPACE_ID),
-                Map.of("fileName", VALID_FILE_NAME,
-                        "size", VALID_SIZE),
-                TYPE_REF_V1_GET_UPLOAD_URL_RESPONSE,
+        V1GetUploadUrlResponse result = restTestUtil.postPerform(
+                String.format(POST_UPLOAD_URL_API_URL, SPACE_ID),
+                Map.of(),
+                new V1GetUploadUrlRequest(VALID_FILE_NAME, VALID_SIZE),
+                TYPE_REF_V1_POST_UPLOAD_URL_RESPONSE,
                 Map.of(),
                 status().isOk()
         );
 
         assertNotNull(result);
         assertNotNull(result.uploadUrl());
-        assertNotNull(result.fileUuid());
+        assertNotNull(result.nodeId());
     }
 
     @Test
     @DisplayName("Ошибки валидации по получению presigned URL для загрузки файла")
     void getUploadUrl_validationError() throws Exception {
-        List<String> result = restTestUtil.getPerform(
-                String.format(GET_UPLOAD_URL_API_URL, SPACE_ID),
-                Map.of("fileName", INVALID_FILE_NAME,
-                        "size", INVALID_SIZE),
-                TYPE_REF_V1_GET_UPLOAD_URL_RESPONSE_VALIDATION_ERROR,
+        List<String> result = restTestUtil.postPerform(
+                String.format(POST_UPLOAD_URL_API_URL, SPACE_ID),
+                Map.of(),
+                new V1GetUploadUrlRequest(INVALID_FILE_NAME, INVALID_SIZE),
+                TYPE_REF_V1_POST_UPLOAD_URL_RESPONSE_VALIDATION_ERROR,
                 Map.of(),
                 status().isBadRequest()
         );
@@ -94,7 +95,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
                 List.of(JwtBuilder.TEST_USER_ID), "/NodeControllerIntegrationTest/PersonaGetUsersResponse.json");
 
         V1GetFileStatusResponse result = restTestUtil.getPerform(
-                String.format(GET_STATUS_API_URL, SPACE_ID),
+                String.format(GET_STATUS_API_URL, SPACE_ID, storageNode.getId()),
                 Map.of("fileUuid", storageNode.getFileUuid()),
                 TYPE_REF_V1_GET_FILE_STATUS_RESPONSE,
                 Map.of(),
@@ -112,8 +113,8 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
         StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.IN_PROGRESS);
 
         V1GetFileStatusResponse result = restTestUtil.getPerform(
-                String.format(GET_STATUS_API_URL, SPACE_ID),
-                Map.of("fileUuid", storageNode.getFileUuid()),
+                String.format(GET_STATUS_API_URL, SPACE_ID, storageNode.getId()),
+                Map.of(),
                 TYPE_REF_V1_GET_FILE_STATUS_RESPONSE,
                 Map.of(),
                 status().isOk()
@@ -142,22 +143,22 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
         assertEquals(2, result.size());
         V1GetNodesResponse firstResultNode = result.getFirst();
         assertEquals(secondNode.getNodeName(), firstResultNode.fileName());
-        assertEquals(secondNode.getFileUuid().toString(), firstResultNode.fileUuid());
+        assertEquals(secondNode.getId().toString(), firstResultNode.nodeId());
         V1GetNodesResponse secondResultNode = result.get(1);
         assertEquals(firstNode.getNodeName(), secondResultNode.fileName());
-        assertEquals(firstNode .getFileUuid().toString(), secondResultNode.fileUuid());
+        assertEquals(firstNode.getId().toString(), secondResultNode.nodeId());
     }
 
     @Test
     @DisplayName("Получение presigned URL для скачивания файла")
     void getDownloadUrl_success() throws Exception {
         UUID fileUuid = UUID.randomUUID();
-        testDataHelper.createStorageNodeWith(fileUuid);
+        StorageNode storageNode = testDataHelper.createStorageNodeWith(fileUuid);
         wireMockTestHelper.stubBazarFilesInitiateDownload_200(
                 fileUuid.toString(), "/NodeControllerIntegrationTest/V1InitiateDownloadResponseDto.json");
 
         V1GetDownloadUrlResponse result = restTestUtil.getPerform(
-                String.format(GET_DOWNLOAD_URL_API_URL, SPACE_ID),
+                String.format(GET_DOWNLOAD_URL_API_URL, SPACE_ID, storageNode.getId()),
                 Map.of("fileUuid", fileUuid),
                 TYPE_REF_V1_GET_DOWNLOAD_URL_RESPONSE,
                 Map.of(),

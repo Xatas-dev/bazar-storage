@@ -8,10 +8,12 @@ import org.bazar.bazarstorage.app.api.exception.BusinessException;
 import org.bazar.bazarstorage.app.api.exception.ErrorCode;
 import org.bazar.bazarstorage.app.api.files.FilesService;
 import org.bazar.bazarstorage.app.impl.node.commands.GetUploadUrlCommand;
-import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
+import org.bazar.bazarstorage.app.impl.node.output.InitiateUploadResult;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -23,7 +25,7 @@ public class FilesServiceImpl implements FilesService {
     private final FilesMapper mapper;
 
     @Override
-    public UploadUrlInfo initiateUpload(GetUploadUrlCommand command) {
+    public InitiateUploadResult initiateUpload(GetUploadUrlCommand command) {
         try {
             MediaType contentType = MediaTypeFactory.getMediaType(command.fileName()).orElse(MediaType.APPLICATION_OCTET_STREAM);
             V1InitiateUploadResponseDto response = feignClient.initiateUpload(
@@ -40,9 +42,9 @@ public class FilesServiceImpl implements FilesService {
     }
 
     @Override
-    public String initiateDownload(String fileUuid) {
+    public String initiateDownload(UUID fileUuid) {
         try {
-            return feignClient.initiateDownload(fileUuid).downloadUrl();
+            return feignClient.initiateDownload(fileUuid.toString()).downloadUrl();
         } catch (FeignException e) {
             log.error("Error while calling files service to initiate download: status {}, message {}", e.status(), e.getMessage());
             throw new BusinessException(ErrorCode.TECH_ERROR);

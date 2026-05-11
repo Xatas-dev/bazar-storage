@@ -13,4 +13,6 @@ public interface StorageNodeRepository {
     Optional<StorageNode> findByFileUuid(String fileUuid);
 
     Page<StorageNode> findBySpaceIdAndStatus(Long spaceId, StorageNodeStatus status, Pageable pageable);
+
+    Optional<StorageNode> findById(Long nodeId);
 }

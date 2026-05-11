@@ -31,4 +31,8 @@ public class StorageNodeJpaRepositoryAdapter implements StorageNodeRepository {
         return storageNodeJpaRepository.findBySpaceIdAndStatus(spaceId, status, pageable);
     }
 
+    @Override
+    public Optional<StorageNode> findById(Long nodeId) {
+        return storageNodeJpaRepository.findById(nodeId);
+    }
 }

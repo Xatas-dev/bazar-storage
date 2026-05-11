@@ -5,6 +5,7 @@ import org.bazar.bazarstorage.app.impl.node.output.AuthorInfo;
 import org.bazar.bazarstorage.app.impl.node.output.AuthorStatus;
 import org.bazar.bazarstorage.app.impl.node.output.DownloadUrlInfo;
 import org.bazar.bazarstorage.app.impl.node.output.FileStatusInfo;
+import org.bazar.bazarstorage.app.impl.node.output.InitiateUploadResult;
 import org.bazar.bazarstorage.app.impl.node.output.NodeInfo;
 import org.bazar.bazarstorage.app.impl.node.output.NodeInfoPage;
 import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
@@ -25,11 +26,12 @@ public interface StorageNodeMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "parent", ignore = true)
-    StorageNode toDomain(GetUploadUrlCommand command, UploadUrlInfo uploadUrlInfo, UUID userId);
+    StorageNode toDomain(GetUploadUrlCommand command, InitiateUploadResult uploadUrlInfo, UUID userId);
 
     @Mapping(target = "fileName", source = "storageNode.nodeName")
     @Mapping(target = "uploadedAt", source = "storageNode.createdAt")
     @Mapping(target = "author", expression = "java(toAuthorInfo(user, status))")
+    @Mapping(target = "nodeId", source = "storageNode.id")
     NodeInfo toNodeInfo(StorageNode storageNode, User user, AuthorStatus status);
 
     AuthorInfo toAuthorInfo(User user, AuthorStatus status);
@@ -47,7 +49,10 @@ public interface StorageNodeMapper {
     @Mapping(target = "author", expression = "java(toAuthorInfo(user, authorStatus))")
     FileStatusInfo toFileStatusInfo(String status, User user, AuthorStatus authorStatus);
 
+    @Mapping(target = "author", ignore = true)
     FileStatusInfo toFileStatusInfo(String status);
 
     DownloadUrlInfo toDownloadUrlInfo(String downloadUrl);
+
+    UploadUrlInfo toUploadUrlInfo(InitiateUploadResult initiateUploadResult, String nodeId);
 }

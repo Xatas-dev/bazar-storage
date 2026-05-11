@@ -7,6 +7,6 @@ public record V1GetUploadUrlResponse(
         @Schema(description = "URL для загрузки в хранилище")
         String uploadUrl,
 
-        @Schema(description = "UUID файла в bazar-files")
-        String fileUuid
+        @Schema(description = "Идентификатор созданного узла")
+        String nodeId
 ) {}
