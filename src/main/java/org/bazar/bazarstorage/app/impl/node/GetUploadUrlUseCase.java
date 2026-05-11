@@ -11,6 +11,7 @@ import org.bazar.bazarstorage.app.api.node.exception.FileValidationException;
 import org.bazar.bazarstorage.app.impl.node.commands.GetUploadUrlCommand;
 import org.bazar.bazarstorage.app.impl.helper.FilesHelper;
 import org.bazar.bazarstorage.app.impl.helper.ValidatorHelper;
+import org.bazar.bazarstorage.app.impl.node.output.InitiateUploadResult;
 import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
 import org.bazar.bazarstorage.app.service.AuthenticationService;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
@@ -44,12 +45,12 @@ public class GetUploadUrlUseCase implements GetUploadUrlInbound {
             throw new FileValidationException(validationErrors);
         }
 
-        UploadUrlInfo uploadUrlInfo = filesService.initiateUpload(command);
+        InitiateUploadResult initiateUploadResult = filesService.initiateUpload(command);
         UUID userId = authenticationService.getAuthenticatedUserId();
-        StorageNode storageNode = storageNodeMapper.toDomain(command, uploadUrlInfo, userId);
+        StorageNode storageNode = storageNodeMapper.toDomain(command, initiateUploadResult, userId);
         storageNodeRepository.save(storageNode);
 
-        return uploadUrlInfo;
+        return storageNodeMapper.toUploadUrlInfo(initiateUploadResult, storageNode.getId().toString());
     }
 
     // =================================================================================================================

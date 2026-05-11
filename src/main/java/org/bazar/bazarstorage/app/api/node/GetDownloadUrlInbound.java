@@ -3,5 +3,5 @@ package org.bazar.bazarstorage.app.api.node;
 import org.bazar.bazarstorage.app.impl.node.output.DownloadUrlInfo;
 
 public interface GetDownloadUrlInbound {
-    DownloadUrlInfo execute(String fileUuid);
+    DownloadUrlInfo execute(String nodeId);
 }

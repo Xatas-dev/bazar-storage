@@ -1,6 +1,7 @@
 package org.bazar.bazarstorage.app.impl.node.output;
 
-public record UploadUrlInfo(
+public record InitiateUploadResult(
         String uploadUrl,
-        String nodeId
-) {}
+        String fileUuid
+) {
+}

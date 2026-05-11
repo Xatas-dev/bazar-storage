@@ -19,10 +19,10 @@ import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -35,17 +35,17 @@ public class NodeController implements NodeControllerSwagger {
     private final GetNodesBySpaceIdInbound getNodesBySpaceIdInbound;
     private final GetDownloadUrlInbound getDownloadUrlInbound;
 
-    @GetMapping("/upload-url")
-    public V1GetUploadUrlResponse getUploadUrl(@ModelAttribute V1GetUploadUrlRequest request, @PathVariable String spaceId) {
+    @PostMapping
+    public V1GetUploadUrlResponse getUploadUrl(@RequestBody V1GetUploadUrlRequest request, @PathVariable String spaceId) {
         GetUploadUrlCommand command = restNodeMapper.toCommand(request, spaceId);
         UploadUrlInfo urlInfo = getUploadUrlInbound.execute(command);
         return restNodeMapper.toResponse(urlInfo);
     }
 
-    // TODO: продумать, нужен ли в методе spaceId, если fileUuid уникальный. Решение или изменения в коде делать в рамках задачи: https://grinbog015.atlassian.net/browse/BZR-112
-    @GetMapping("/status")
-    public V1GetFileStatusResponse getFileStatus(@RequestParam String fileUuid, @PathVariable String spaceId) {
-        FileStatusInfo status = getFileStatusInbound.execute(fileUuid);
+    // TODO: продумать, нужен ли в методе spaceId, если nodeId уникальный. Решение или изменения в коде делать в рамках задачи: https://grinbog015.atlassian.net/browse/BZR-112
+    @GetMapping("/{nodeId}/status")
+    public V1GetFileStatusResponse getFileStatus(@PathVariable String spaceId, @PathVariable String nodeId) {
+        FileStatusInfo status = getFileStatusInbound.execute(nodeId);
         return restNodeMapper.toResponse(status);
     }
 
@@ -56,9 +56,9 @@ public class NodeController implements NodeControllerSwagger {
         return restNodeMapper.toResponse(nodeInfoPage);
     }
 
-    @GetMapping("/url-for-download")
-    public V1GetDownloadUrlResponse getUrlForDownload(@PathVariable String spaceId, @RequestParam String fileUuid) {
-        DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(fileUuid);
+    @GetMapping("/{nodeId}/download")
+    public V1GetDownloadUrlResponse getUrlForDownload(@PathVariable String spaceId, @PathVariable String nodeId) {
+        DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(nodeId);
         return restNodeMapper.toResponse(urlInfo);
     }
 }

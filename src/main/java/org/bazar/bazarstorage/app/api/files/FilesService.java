@@ -1,10 +1,12 @@
 package org.bazar.bazarstorage.app.api.files;
 
 import org.bazar.bazarstorage.app.impl.node.commands.GetUploadUrlCommand;
-import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
+import org.bazar.bazarstorage.app.impl.node.output.InitiateUploadResult;
+
+import java.util.UUID;
 
 public interface FilesService {
-    UploadUrlInfo initiateUpload(GetUploadUrlCommand command);
+    InitiateUploadResult initiateUpload(GetUploadUrlCommand command);
 
-    String initiateDownload(String fileUuid);
+    String initiateDownload(UUID fileUuid);
 }

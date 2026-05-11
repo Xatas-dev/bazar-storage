@@ -1,7 +1,7 @@
 package org.bazar.bazarstorage.app.impl.node.output;
 
 public record NodeInfo(
-        String fileUuid,
+        String nodeId,
         String fileName,
         Long size,
         String type,
