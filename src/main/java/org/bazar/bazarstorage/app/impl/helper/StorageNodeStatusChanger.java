@@ -10,7 +10,8 @@ import java.util.List;
 @Component
 @Slf4j
 public class StorageNodeStatusChanger {
-    private static final List<StorageNodeStatus> TERMINAL_STATUSES = List.of(StorageNodeStatus.UPLOADED, StorageNodeStatus.ERROR);
+    private static final List<StorageNodeStatus> TERMINAL_STATUSES =
+            List.of(StorageNodeStatus.ERROR, StorageNodeStatus.DELETED);
 
     public void changeStatus(StorageNode storageNode, StorageNodeStatus status) {
         StorageNodeStatus oldStatus = storageNode.getStatus();

@@ -168,4 +168,23 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
         assertNotNull(result);
         assertNotNull(result.downloadUrl());
     }
+
+    @Test
+    @DisplayName("Удаление узла из пространства")
+    void deleteNode_success() throws Exception {
+        StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.UPLOADED);
+
+        restTestUtil.deletePerform(
+                String.format(DELETE_NODE_API_URL, SPACE_ID, storageNode.getId()),
+                Map.of(),
+                null,
+                new TypeReference<Void>() {},
+                Map.of(),
+                status().isOk()
+        );
+
+        StorageNode deletedNode = testDataHelper.findStorageNodeById(storageNode.getId());
+
+        assertEquals(StorageNodeStatus.DELETED, deletedNode.getStatus());
+    }
 }

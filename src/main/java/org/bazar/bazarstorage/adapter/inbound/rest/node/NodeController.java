@@ -6,6 +6,7 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusRespo
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlRequest;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
+import org.bazar.bazarstorage.app.api.node.DeleteNodeInbound;
 import org.bazar.bazarstorage.app.api.node.GetDownloadUrlInbound;
 import org.bazar.bazarstorage.app.api.node.GetFileStatusInbound;
 import org.bazar.bazarstorage.app.api.node.GetNodesBySpaceIdInbound;
@@ -18,6 +19,7 @@ import org.bazar.bazarstorage.app.impl.node.output.NodeInfoPage;
 import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +36,7 @@ public class NodeController implements NodeControllerSwagger {
     private final GetFileStatusInbound getFileStatusInbound;
     private final GetNodesBySpaceIdInbound getNodesBySpaceIdInbound;
     private final GetDownloadUrlInbound getDownloadUrlInbound;
+    private final DeleteNodeInbound deleteNodeInbound;
 
     @PostMapping
     public V1GetUploadUrlResponse getUploadUrl(@RequestBody V1GetUploadUrlRequest request, @PathVariable String spaceId) {
@@ -60,5 +63,11 @@ public class NodeController implements NodeControllerSwagger {
     public V1GetDownloadUrlResponse getUrlForDownload(@PathVariable String spaceId, @PathVariable String nodeId) {
         DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(nodeId);
         return restNodeMapper.toResponse(urlInfo);
+    }
+
+    // TODO: то же самое что и в getFileStatus
+    @DeleteMapping("/{nodeId}")
+    public void deleteNode(@PathVariable String spaceId, @PathVariable String nodeId) {
+        deleteNodeInbound.execute(nodeId);
     }
 }
