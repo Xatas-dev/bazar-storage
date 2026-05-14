@@ -10,7 +10,8 @@ import java.util.List;
 @Component
 @Slf4j
 public class StorageNodeStatusChanger {
-    private static final List<StorageNodeStatus> TERMINAL_STATUSES = List.of(StorageNodeStatus.UPLOADED, StorageNodeStatus.ERROR);
+    private static final List<StorageNodeStatus> TERMINAL_STATUSES =
+            List.of(StorageNodeStatus.ERROR, StorageNodeStatus.DELETED);
 
     public void changeStatus(StorageNode storageNode, StorageNodeStatus status) {
         StorageNodeStatus oldStatus = storageNode.getStatus();
@@ -21,6 +22,10 @@ public class StorageNodeStatusChanger {
         }
         if (TERMINAL_STATUSES.contains(oldStatus)) {
             log.error("StorageNode {} is in terminal status {}, cannot change to {}", storageNode.getId(), oldStatus, status);
+            return;
+        }
+        if (oldStatus == StorageNodeStatus.UPLOADED && status == StorageNodeStatus.IN_PROGRESS) {
+            log.error("StorageNode {} has status {}, cannot change status to {}", storageNode.getId(), oldStatus, status);
             return;
         }
 

@@ -36,4 +36,9 @@ public interface NodeControllerSwagger {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = V1GetNodesPaginationResponse.class)))
     @ApiResponse(responseCode = "400", description = "Некорректный запрос")
     V1GetDownloadUrlResponse getUrlForDownload(String spaceId, String nodeId);
+
+    @Operation(summary = "Удалить узел из пространства", description = "Возвращает успешный ответ при удалении файла")
+    @ApiResponse(responseCode = "200", description = "Успешный ответ")
+    @ApiResponse(responseCode = "400", description = "Некорректный запрос")
+    void deleteNode(String spaceId, String nodeId);
 }

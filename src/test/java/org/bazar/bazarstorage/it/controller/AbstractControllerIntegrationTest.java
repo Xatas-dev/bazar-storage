@@ -9,6 +9,7 @@ public abstract class AbstractControllerIntegrationTest extends AbstractIntegrat
     protected static final String GET_STATUS_API_URL = "/api/v1/spaces/%s/nodes/%s/status";
     protected static final String GET_NODES_API_URL = "/api/v1/spaces/%s/nodes";
     protected static final String GET_DOWNLOAD_URL_API_URL = "/api/v1/spaces/%s/nodes/%s/download";
+    protected static final String DELETE_NODE_API_URL = "/api/v1/spaces/%s/nodes/%s";
 
     @Autowired
     protected RestTestUtil restTestUtil;

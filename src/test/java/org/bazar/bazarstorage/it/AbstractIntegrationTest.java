@@ -1,5 +1,6 @@
 package org.bazar.bazarstorage.it;
 
+import org.bazar.bazarstorage.adapter.outbound.persistence.storagenode.StorageNodeJpaRepository;
 import org.bazar.bazarstorage.fw.BazarStorageApplication;
 import org.bazar.bazarstorage.it.testutil.TestDataHelper;
 import org.bazar.bazarstorage.it.testutil.WireMockTestHelper;
@@ -28,6 +29,8 @@ public abstract class AbstractIntegrationTest {
     protected WireMockTestHelper wireMockTestHelper;
     @Autowired
     protected TestDataHelper testDataHelper;
+    @Autowired
+    protected StorageNodeJpaRepository storageNodeJpaRepository;
 
     @BeforeEach
     void cleanUp() {
