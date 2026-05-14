@@ -65,7 +65,7 @@ public class NodeController implements NodeControllerSwagger {
         return restNodeMapper.toResponse(urlInfo);
     }
 
-    // TODO: то же самое что и в getFileStatus
+    // TODO: то же самое что и в getFileStatus. Решение или изменения в коде делать в рамках задачи: https://grinbog015.atlassian.net/browse/BZR-112
     @DeleteMapping("/{nodeId}")
     public void deleteNode(@PathVariable String spaceId, @PathVariable String nodeId) {
         deleteNodeInbound.execute(nodeId);

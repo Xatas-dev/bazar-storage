@@ -24,6 +24,10 @@ public class StorageNodeStatusChanger {
             log.error("StorageNode {} is in terminal status {}, cannot change to {}", storageNode.getId(), oldStatus, status);
             return;
         }
+        if (oldStatus == StorageNodeStatus.UPLOADED && status == StorageNodeStatus.IN_PROGRESS) {
+            log.error("StorageNode {} has status {}, cannot change status to {}", storageNode.getId(), oldStatus, status);
+            return;
+        }
 
         storageNode.setStatus(status);
         log.info("StorageNode {} status changed from {} to {}", storageNode.getId(), oldStatus, status);
