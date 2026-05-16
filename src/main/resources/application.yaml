@@ -43,3 +43,7 @@ settings:
     max-file-size: ${SETTING_MAX_FILE_SIZE}
     not-allowed-extensions: ${SETTING_NOT_ALLOWED_EXTENSIONS}
     max-file-name-length: ${SETTING_MAX_FILE_NAME_LENGTH}
+  schedule:
+    delete-marked-files:
+      cron: ${SETTING_SCHEDULE_DELETE_MARKED_FILES_CRON}
+      batch-size: ${SETTING_SCHEDULE_DELETE_MARKED_FILES_BATCH_SIZE}

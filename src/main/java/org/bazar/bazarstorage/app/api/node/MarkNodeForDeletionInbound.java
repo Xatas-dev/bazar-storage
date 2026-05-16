@@ -1,5 +1,5 @@
 package org.bazar.bazarstorage.app.api.node;
 
-public interface DeleteNodeInbound {
+public interface MarkNodeForDeletionInbound {
     void execute(String nodeId);
 }

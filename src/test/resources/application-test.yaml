@@ -27,3 +27,7 @@ settings:
     max-file-size: 52428800
     not-allowed-extensions: [exe, sh, bat, msi, bin, ps1, hta]
     max-file-name-length: 100
+  schedule:
+    delete-marked-files:
+      cron: "0 */10 * * * *"
+      batch-size: 2

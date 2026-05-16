@@ -12,6 +12,7 @@ import java.util.Map;
 @ConfigurationProperties("settings")
 public class SettingProperties {
     private FileValidation fileValidation;
+    private Schedule schedule;
 
     @Data
     public static class FileValidation {
@@ -24,6 +25,16 @@ public class SettingProperties {
             FILE_TOO_LARGE,
             FILE_EXTENSION_NOT_ALLOWED,
             FILE_NAME_TOO_LARGE
+        }
+    }
+
+    @Data
+    public static class Schedule {
+        private DeleteMarkedFiles deleteMarkedFiles;
+
+        @Data
+        public static class DeleteMarkedFiles {
+            private Integer batchSize;
         }
     }
 }

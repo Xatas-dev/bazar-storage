@@ -26,4 +26,8 @@ public class TestDataHelper {
     public StorageNode createStorageNodeWith(UUID fileUuid) {
         return storageNodeJpaRepository.save(StorageNodeBuilder.buildWith(fileUuid));
     }
+
+    public StorageNode createStorageNodeWith(UUID fileUuid, StorageNodeStatus status) {
+        return storageNodeJpaRepository.save(StorageNodeBuilder.buildWith(fileUuid, status));
+    }
 }

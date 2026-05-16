@@ -50,4 +50,14 @@ public class FilesServiceImpl implements FilesService {
             throw new BusinessException(ErrorCode.TECH_ERROR);
         }
     }
+
+    @Override
+    public void deleteFileByFileUuid(UUID fileUuid) {
+        try {
+            feignClient.deleteByFileUuid(fileUuid.toString());
+        } catch (FeignException e) {
+            log.error("Error while calling files service to delete file {}", fileUuid, e);
+            throw new BusinessException(ErrorCode.TECH_ERROR);
+        }
+    }
 }
