@@ -1,0 +1,32 @@
+# Создай локально application-local.yaml и скопируй содержимое этого файла туда (если нужно, что-то поменяй).
+# Не забудь добавить профиль local в конфигурацию запуска!
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bazar_storage
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8085/realms/local
+  kafka:
+    bootstrap-servers: localhost:9092
+
+settings:
+  file-validation:
+    max-file-size: 52428800
+    not-allowed-extensions: [exe, sh, bat, msi, bin, ps1, hta]
+    max-file-name-length: 100
+  schedule:
+    delete-marked-files:
+      cron: "*/10 * * * * *"
+      batch-size: 2
+
+service:
+  bazar-files:
+    url: http://localhost:${service.bazar-files.port}/api
+    port: 8081
+  bazar-persona:
+    url: http://localhost:${service.bazar-persona.port}/api
+    port: 8082

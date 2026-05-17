@@ -1,0 +1,49 @@
+package org.bazar.bazarstorage.adapter.outbound.persistence.storagenode;
+
+import lombok.RequiredArgsConstructor;
+import org.bazar.bazarstorage.app.api.node.StorageNodeRepository;
+import org.bazar.bazarstorage.domain.storagenode.StorageNode;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Component
+@RequiredArgsConstructor
+public class StorageNodeJpaRepositoryAdapter implements StorageNodeRepository {
+    private final StorageNodeJpaRepository storageNodeJpaRepository;
+
+    @Override
+    public void save(StorageNode storageNode) {
+        storageNodeJpaRepository.save(storageNode);
+    }
+
+    @Override
+    public Optional<StorageNode> findByFileUuid(String fileUuid) {
+        return storageNodeJpaRepository.findByFileUuid(UUID.fromString(fileUuid));
+    }
+
+    @Override
+    public Page<StorageNode> findBySpaceIdAndStatus(Long spaceId, StorageNodeStatus status, Pageable pageable) {
+        return storageNodeJpaRepository.findBySpaceIdAndStatus(spaceId, status, pageable);
+    }
+
+    @Override
+    public Optional<StorageNode> findById(Long nodeId) {
+        return storageNodeJpaRepository.findById(nodeId);
+    }
+
+    @Override
+    public List<StorageNode> findDeletedNodesAfterId(Long lastId, Integer batch) {
+        return storageNodeJpaRepository.findNodesByStatusAfterIdWithLimit(lastId, StorageNodeStatus.DELETED.name(), batch);
+    }
+
+    @Override
+    public void deleteAllByIds(List<Long> ids) {
+        storageNodeJpaRepository.deleteAllByIdInBatch(ids);
+    }
+}

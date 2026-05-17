@@ -1,0 +1,49 @@
+spring:
+  profiles:
+    include: file_validation
+  datasource:
+    url: ${SYSTEM_DB_URL}
+    username: ${SYSTEM_DB_USERNAME}
+    password: ${SYSTEM_DB_PASSWORD}
+  liquibase:
+    change-log: db/changelog/changelog-master.yaml
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${INTEGRATION_KEYCLOAK_EXTERNAL_URL}/realms/${INTEGRATION_KEYCLOAK_REALM}
+  kafka:
+    bootstrap-servers: ${INTEGRATION_KAFKA_BOOTSTRAP_SERVERS}
+    consumer:
+      group-id: group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+management:
+  server:
+    port: 8090
+
+server:
+  port: 8080
+
+kafka:
+  file-events:
+    topic: file.events
+    group-id: space-events-group
+
+service:
+  bazar-files:
+    url: ${INTEGRATION_REST_BAZAR_FILES_API_URL}
+  bazar-persona:
+    url: ${INTEGRATION_REST_BAZAR_PERSONA_API_URL}
+
+settings:
+  file-validation:
+    max-file-size: ${SETTING_MAX_FILE_SIZE}
+    not-allowed-extensions: ${SETTING_NOT_ALLOWED_EXTENSIONS}
+    max-file-name-length: ${SETTING_MAX_FILE_NAME_LENGTH}
+  schedule:
+    delete-marked-files:
+      cron: ${SETTING_SCHEDULE_DELETE_MARKED_FILES_CRON}
+      batch-size: ${SETTING_SCHEDULE_DELETE_MARKED_FILES_BATCH_SIZE}
