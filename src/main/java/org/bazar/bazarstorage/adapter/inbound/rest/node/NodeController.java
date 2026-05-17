@@ -6,7 +6,7 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusRespo
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlRequest;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
-import org.bazar.bazarstorage.app.api.node.DeleteNodeInbound;
+import org.bazar.bazarstorage.app.api.node.MarkNodeForDeletionInbound;
 import org.bazar.bazarstorage.app.api.node.GetDownloadUrlInbound;
 import org.bazar.bazarstorage.app.api.node.GetFileStatusInbound;
 import org.bazar.bazarstorage.app.api.node.GetNodesBySpaceIdInbound;
@@ -36,7 +36,7 @@ public class NodeController implements NodeControllerSwagger {
     private final GetFileStatusInbound getFileStatusInbound;
     private final GetNodesBySpaceIdInbound getNodesBySpaceIdInbound;
     private final GetDownloadUrlInbound getDownloadUrlInbound;
-    private final DeleteNodeInbound deleteNodeInbound;
+    private final MarkNodeForDeletionInbound markNodeForDeletionInbound;
 
     @PostMapping
     public V1GetUploadUrlResponse getUploadUrl(@RequestBody V1GetUploadUrlRequest request, @PathVariable String spaceId) {
@@ -68,6 +68,6 @@ public class NodeController implements NodeControllerSwagger {
     // TODO: то же самое что и в getFileStatus. Решение или изменения в коде делать в рамках задачи: https://grinbog015.atlassian.net/browse/BZR-112
     @DeleteMapping("/{nodeId}")
     public void deleteNode(@PathVariable String spaceId, @PathVariable String nodeId) {
-        deleteNodeInbound.execute(nodeId);
+        markNodeForDeletionInbound.execute(nodeId);
     }
 }

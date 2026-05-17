@@ -9,4 +9,6 @@ public interface FilesService {
     InitiateUploadResult initiateUpload(GetUploadUrlCommand command);
 
     String initiateDownload(UUID fileUuid);
+
+    void deleteFileByFileUuid(UUID fileUuid);
 }

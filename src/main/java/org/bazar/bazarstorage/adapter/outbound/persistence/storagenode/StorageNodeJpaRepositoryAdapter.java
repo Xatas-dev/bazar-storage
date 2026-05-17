@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,5 +35,15 @@ public class StorageNodeJpaRepositoryAdapter implements StorageNodeRepository {
     @Override
     public Optional<StorageNode> findById(Long nodeId) {
         return storageNodeJpaRepository.findById(nodeId);
+    }
+
+    @Override
+    public List<StorageNode> findDeletedNodesAfterId(Long lastId, Integer batch) {
+        return storageNodeJpaRepository.findNodesByStatusAfterIdWithLimit(lastId, StorageNodeStatus.DELETED.name(), batch);
+    }
+
+    @Override
+    public void deleteAllByIds(List<Long> ids) {
+        storageNodeJpaRepository.deleteAllByIdInBatch(ids);
     }
 }

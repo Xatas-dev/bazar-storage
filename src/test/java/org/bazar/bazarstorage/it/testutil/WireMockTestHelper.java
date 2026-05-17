@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
@@ -19,6 +20,7 @@ public class WireMockTestHelper {
     private static final String GET_USERS_BAZAR_PERSONA = "/users";
     private static final String INITIATE_UPLOAD_BAZAR_FILES = "/api/v1/files/initiate-upload";
     private static final String INITIATE_DOWNLOAD_BAZAR_FILES = "/api/v1/files/initiate-download";
+    private static final String DELETE_FILE_BY_FILE_UUID_BAZAR_FILES = "/api/v1/files/%s";
 
     @Autowired
     protected WireMockServer bazarPersonaServer;
@@ -73,5 +75,11 @@ public class WireMockTestHelper {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(readFileWithoutThrow(bodyPath))));
+    }
+
+    public void stubBazarFilesDeleteFileByFileUuid(String fileUuid, Integer status) {
+        bazarFilesServer.stubFor(delete(urlPathEqualTo(String.format(DELETE_FILE_BY_FILE_UUID_BAZAR_FILES, fileUuid)))
+                .willReturn(aResponse()
+                        .withStatus(status)));
     }
 }
