@@ -22,6 +22,7 @@ settings:
     delete-marked-files:
       cron: "*/10 * * * * *"
       batch-size: 2
+      retention-days: 7
 
 service:
   bazar-files:

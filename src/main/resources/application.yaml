@@ -47,3 +47,4 @@ settings:
     delete-marked-files:
       cron: ${SETTING_SCHEDULE_DELETE_MARKED_FILES_CRON}
       batch-size: ${SETTING_SCHEDULE_DELETE_MARKED_FILES_BATCH_SIZE}
+      retention-days: ${SETTING_SCHEDULE_DELETE_MARKED_FILES_RETENTION_DAYS}

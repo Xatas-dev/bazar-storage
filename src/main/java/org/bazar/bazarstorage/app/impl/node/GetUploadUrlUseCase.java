@@ -60,14 +60,14 @@ public class GetUploadUrlUseCase implements GetUploadUrlInbound {
     // TODO: подумать над вынесением в отдельный класс с последующим расширением под валидацию папок. Будет реализовано в рамках стори https://grinbog015.atlassian.net/browse/BZR-104
     private List<String> validateFile(GetUploadUrlCommand command) {
         List<String> validationErrors = new ArrayList<>();
-        Long maxFileSize = settingProperties.getFileValidation().getMaxFileSize();
-        Integer maxFileNameLength = settingProperties.getFileValidation().getMaxFileNameLength();
+        Long maxFileSize = settingProperties.fileValidation().maxFileSize();
+        Integer maxFileNameLength = settingProperties.fileValidation().maxFileNameLength();
         String extension = FilesHelper.getExtension(command.fileName());
 
         if (command.size() > maxFileSize) {
             validationErrors.add(String.format(validatorHelper.getErrorMessage(FILE_TOO_LARGE), maxFileSize));
         }
-        if (settingProperties.getFileValidation().getNotAllowedExtensions().contains(extension)) {
+        if (settingProperties.fileValidation().notAllowedExtensions().contains(extension)) {
             validationErrors.add(String.format(validatorHelper.getErrorMessage(FILE_EXTENSION_NOT_ALLOWED), extension));
         }
         if (command.fileName().length() > maxFileNameLength) {

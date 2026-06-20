@@ -10,8 +10,11 @@ import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Component
 @RequiredArgsConstructor
@@ -26,10 +29,12 @@ public class DeleteMarkedNodesUseCase implements DeleteMarkedNodesInbound {
     public void execute() {
         Long lastId = 0L;
         while (true) {
-            List<StorageNode> nodesToDelete = storageNodeRepository.findDeletedNodesAfterId(
-                    lastId,
-                    settingProperties.getSchedule().getDeleteMarkedFiles().getBatchSize()
-            );
+            Integer retentionDays = settingProperties.schedule().deleteMarkedFiles().retentionDays();
+            Instant retentionThreshold = Instant.now().minus(retentionDays, DAYS);
+            Integer batchSize = settingProperties.schedule().deleteMarkedFiles().batchSize();
+
+            List<StorageNode> nodesToDelete = storageNodeRepository.findDeletedNodesAfterIdWithRetention(
+                    lastId, retentionThreshold, batchSize);
             if (nodesToDelete.isEmpty()) {
                 break;
             }
