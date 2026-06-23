@@ -18,8 +18,6 @@ public interface StorageNodeRepository {
 
     Optional<StorageNode> findById(Long nodeId);
 
-    List<StorageNode> findDeletedNodesAfterId(Long lastId, Integer batchSize);
-
     List<StorageNode> findDeletedNodesAfterIdWithRetention(Long lastId, Instant retentionThreshold, Integer batchSize);
 
     void deleteAllByIds(List<Long> ids);

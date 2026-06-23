@@ -39,11 +39,6 @@ public class StorageNodeJpaRepositoryAdapter implements StorageNodeRepository {
     }
 
     @Override
-    public List<StorageNode> findDeletedNodesAfterId(Long lastId, Integer batchSize) {
-        return storageNodeJpaRepository.findNodesByStatusAfterIdWithLimit(lastId, StorageNodeStatus.DELETED.name(), batchSize);
-    }
-
-    @Override
     public List<StorageNode> findDeletedNodesAfterIdWithRetention(Long lastId,  Instant retentionThreshold, Integer batchSize) {
         return storageNodeJpaRepository.findNodesByStatusAfterIdWithRetentionAndLimit(
                 lastId, StorageNodeStatus.DELETED.name(), retentionThreshold, batchSize);

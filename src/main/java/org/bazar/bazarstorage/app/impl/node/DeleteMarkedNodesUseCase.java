@@ -28,13 +28,14 @@ public class DeleteMarkedNodesUseCase implements DeleteMarkedNodesInbound {
     @Override
     public void execute() {
         Long lastId = 0L;
-        while (true) {
-            Integer retentionDays = settingProperties.schedule().deleteMarkedFiles().retentionDays();
-            Instant retentionThreshold = Instant.now().minus(retentionDays, DAYS);
-            Integer batchSize = settingProperties.schedule().deleteMarkedFiles().batchSize();
+        var settings = settingProperties.schedule().deleteMarkedFiles();
+        Integer retentionDays = settings.retentionDays();
+        Instant retentionThreshold = Instant.now().minus(retentionDays, DAYS);
+        Integer batchSize = settings.batchSize();
 
-            List<StorageNode> nodesToDelete = storageNodeRepository.findDeletedNodesAfterIdWithRetention(
-                    lastId, retentionThreshold, batchSize);
+        while (true) {
+            List<StorageNode> nodesToDelete = storageNodeRepository
+                    .findDeletedNodesAfterIdWithRetention(lastId, retentionThreshold, batchSize);
             if (nodesToDelete.isEmpty()) {
                 break;
             }
@@ -45,7 +46,7 @@ public class DeleteMarkedNodesUseCase implements DeleteMarkedNodesInbound {
                     successfullyDeletedIds.add(storageNode.getId());
                 }
             });
-            deleteFromDb(successfullyDeletedIds);
+            storageNodeRepository.deleteAllByIds(successfullyDeletedIds);
 
             lastId = nodesToDelete.getLast().getId();
         }
@@ -62,13 +63,6 @@ public class DeleteMarkedNodesUseCase implements DeleteMarkedNodesInbound {
         } catch (Exception e) {
             log.error("Failed to cleanup file {}", storageNode.getFileUuid(), e);
             return false;
-        }
-    }
-
-    private void deleteFromDb(List<Long> idsToDelete) {
-        if (!idsToDelete.isEmpty()) {
-            transactionTemplate.executeWithoutResult(status ->
-                    storageNodeRepository.deleteAllByIds(idsToDelete));
         }
     }
 }

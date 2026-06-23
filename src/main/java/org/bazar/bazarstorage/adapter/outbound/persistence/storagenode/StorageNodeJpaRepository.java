@@ -20,15 +20,6 @@ public interface StorageNodeJpaRepository extends JpaRepository<StorageNode, Lon
     @Query(value = """
     SELECT *
     FROM storage_node sn
-    WHERE sn.status = :status AND sn.id > :lastId
-    ORDER BY sn.id
-    LIMIT :batch
-    """, nativeQuery = true)
-    List<StorageNode> findNodesByStatusAfterIdWithLimit(Long lastId, String status, Integer batch);
-
-    @Query(value = """
-    SELECT *
-    FROM storage_node sn
     WHERE sn.status = :status
           AND sn.id > :lastId
           AND sn.created_at <= :retentionThreshold
