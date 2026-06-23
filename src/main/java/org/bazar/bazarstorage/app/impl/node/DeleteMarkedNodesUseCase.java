@@ -10,8 +10,11 @@ import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Component
 @RequiredArgsConstructor
@@ -25,11 +28,14 @@ public class DeleteMarkedNodesUseCase implements DeleteMarkedNodesInbound {
     @Override
     public void execute() {
         Long lastId = 0L;
+        var settings = settingProperties.schedule().deleteMarkedFiles();
+        Integer retentionDays = settings.retentionDays();
+        Instant retentionThreshold = Instant.now().minus(retentionDays, DAYS);
+        Integer batchSize = settings.batchSize();
+
         while (true) {
-            List<StorageNode> nodesToDelete = storageNodeRepository.findDeletedNodesAfterId(
-                    lastId,
-                    settingProperties.getSchedule().getDeleteMarkedFiles().getBatchSize()
-            );
+            List<StorageNode> nodesToDelete = storageNodeRepository
+                    .findDeletedNodesAfterIdWithRetention(lastId, retentionThreshold, batchSize);
             if (nodesToDelete.isEmpty()) {
                 break;
             }
@@ -40,7 +46,7 @@ public class DeleteMarkedNodesUseCase implements DeleteMarkedNodesInbound {
                     successfullyDeletedIds.add(storageNode.getId());
                 }
             });
-            deleteFromDb(successfullyDeletedIds);
+            storageNodeRepository.deleteAllByIds(successfullyDeletedIds);
 
             lastId = nodesToDelete.getLast().getId();
         }
@@ -57,13 +63,6 @@ public class DeleteMarkedNodesUseCase implements DeleteMarkedNodesInbound {
         } catch (Exception e) {
             log.error("Failed to cleanup file {}", storageNode.getFileUuid(), e);
             return false;
-        }
-    }
-
-    private void deleteFromDb(List<Long> idsToDelete) {
-        if (!idsToDelete.isEmpty()) {
-            transactionTemplate.executeWithoutResult(status ->
-                    storageNodeRepository.deleteAllByIds(idsToDelete));
         }
     }
 }

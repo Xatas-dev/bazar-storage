@@ -31,3 +31,4 @@ settings:
     delete-marked-files:
       cron: "0 */10 * * * *"
       batch-size: 2
+      retention-days: 0
