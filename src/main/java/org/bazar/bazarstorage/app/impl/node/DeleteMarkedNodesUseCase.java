@@ -2,7 +2,7 @@ package org.bazar.bazarstorage.app.impl.node;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bazar.bazarstorage.app.api.SettingProperties;
+import org.bazar.bazarstorage.fw.properties.SettingProperties;
 import org.bazar.bazarstorage.app.api.files.FilesService;
 import org.bazar.bazarstorage.app.api.node.DeleteMarkedNodesInbound;
 import org.bazar.bazarstorage.app.api.node.StorageNodeRepository;

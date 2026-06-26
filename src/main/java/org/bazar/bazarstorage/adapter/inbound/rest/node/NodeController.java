@@ -1,6 +1,8 @@
 package org.bazar.bazarstorage.adapter.inbound.rest.node;
 
 import lombok.RequiredArgsConstructor;
+import org.bazar.authorization.sdk.Permission;
+import org.bazar.bazarstorage.adapter.inbound.rest.aop.Authorize;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetDownloadUrlResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
@@ -39,6 +41,7 @@ public class NodeController implements NodeControllerSwagger {
     private final MarkNodeForDeletionInbound markNodeForDeletionInbound;
 
     @PostMapping
+    @Authorize(permission = Permission.NODES_UPLOAD)
     public V1GetUploadUrlResponse getUploadUrl(@RequestBody V1GetUploadUrlRequest request, @PathVariable String spaceId) {
         GetUploadUrlCommand command = restNodeMapper.toCommand(request, spaceId);
         UploadUrlInfo urlInfo = getUploadUrlInbound.execute(command);
@@ -60,6 +63,7 @@ public class NodeController implements NodeControllerSwagger {
     }
 
     @GetMapping("/{nodeId}/download")
+    @Authorize(permission = Permission.NODES_DOWNLOAD)
     public V1GetDownloadUrlResponse getUrlForDownload(@PathVariable String spaceId, @PathVariable String nodeId) {
         DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(nodeId);
         return restNodeMapper.toResponse(urlInfo);
@@ -67,6 +71,7 @@ public class NodeController implements NodeControllerSwagger {
 
     // TODO: то же самое что и в getFileStatus. Решение или изменения в коде делать в рамках задачи: https://grinbog015.atlassian.net/browse/BZR-112
     @DeleteMapping("/{nodeId}")
+    @Authorize(permission = Permission.NODES_DELETE)
     public void deleteNode(@PathVariable String spaceId, @PathVariable String nodeId) {
         markNodeForDeletionInbound.execute(nodeId);
     }

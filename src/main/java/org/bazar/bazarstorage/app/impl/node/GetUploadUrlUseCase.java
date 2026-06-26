@@ -2,7 +2,7 @@ package org.bazar.bazarstorage.app.impl.node;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bazar.bazarstorage.app.api.SettingProperties;
+import org.bazar.bazarstorage.fw.properties.SettingProperties;
 import org.bazar.bazarstorage.app.api.files.FilesService;
 import org.bazar.bazarstorage.app.api.node.GetUploadUrlInbound;
 import org.bazar.bazarstorage.app.api.node.StorageNodeMapper;
@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.bazar.bazarstorage.app.api.SettingProperties.FileValidation.ErrorType.FILE_EXTENSION_NOT_ALLOWED;
-import static org.bazar.bazarstorage.app.api.SettingProperties.FileValidation.ErrorType.FILE_NAME_TOO_LARGE;
-import static org.bazar.bazarstorage.app.api.SettingProperties.FileValidation.ErrorType.FILE_TOO_LARGE;
+import static org.bazar.bazarstorage.fw.properties.SettingProperties.FileValidation.ErrorType.FILE_EXTENSION_NOT_ALLOWED;
+import static org.bazar.bazarstorage.fw.properties.SettingProperties.FileValidation.ErrorType.FILE_NAME_TOO_LARGE;
+import static org.bazar.bazarstorage.fw.properties.SettingProperties.FileValidation.ErrorType.FILE_TOO_LARGE;
 
 @Slf4j
 @RequiredArgsConstructor

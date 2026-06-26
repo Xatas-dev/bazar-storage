@@ -21,6 +21,9 @@ service:
   bazar-persona:
     url: http://localhost:${service.bazar-persona.port}
     port: 8082
+  authorization:
+    host: localhost
+    port: 9090
 
 settings:
   file-validation:
