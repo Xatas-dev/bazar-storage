@@ -57,7 +57,7 @@ dependencies {
 
     //Security
     implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
-    implementation("org.bazar:bazar-authorization-sdk:1.0.0-local")
+    implementation("org.bazar:bazar-authorization-sdk:1.0.0")
 
     //Kafka
     implementation("org.springframework.boot:spring-boot-starter-kafka")
