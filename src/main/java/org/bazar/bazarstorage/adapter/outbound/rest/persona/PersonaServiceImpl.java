@@ -94,7 +94,7 @@ public class PersonaServiceImpl implements PersonaService {
                 return personaFeignClient.getUsers(userIds.stream().map(UUID::toString).toList());
             } catch (FeignException e) {
                 log.error("Error while calling persona service to get users: status {}, message {}", e.status(), e.getMessage());
-                throw new BusinessException(ErrorCode.TECH_ERROR);
+                throw new BusinessException(ErrorCode.TECHNICAL_ERROR);
             }
         }
         return List.of();

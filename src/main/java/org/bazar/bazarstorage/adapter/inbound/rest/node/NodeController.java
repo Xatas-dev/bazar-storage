@@ -1,8 +1,6 @@
 package org.bazar.bazarstorage.adapter.inbound.rest.node;
 
 import lombok.RequiredArgsConstructor;
-import org.bazar.authorization.sdk.Permission;
-import org.bazar.bazarstorage.adapter.inbound.rest.aop.Authorize;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetDownloadUrlResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
@@ -19,6 +17,8 @@ import org.bazar.bazarstorage.app.impl.node.output.DownloadUrlInfo;
 import org.bazar.bazarstorage.app.impl.node.output.FileStatusInfo;
 import org.bazar.bazarstorage.app.impl.node.output.NodeInfoPage;
 import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
+import org.bazar.bazarstorage.app.service.AuthorizationService;
+import org.bazar.bazarstorage.app.util.AuthorizationRequestHelper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,10 +39,12 @@ public class NodeController implements NodeControllerSwagger {
     private final GetNodesBySpaceIdInbound getNodesBySpaceIdInbound;
     private final GetDownloadUrlInbound getDownloadUrlInbound;
     private final MarkNodeForDeletionInbound markNodeForDeletionInbound;
+    private final AuthorizationService authorizationService;
+    private final AuthorizationRequestHelper requestHelper;
 
     @PostMapping
-    @Authorize(permission = Permission.NODES_UPLOAD)
     public V1GetUploadUrlResponse getUploadUrl(@RequestBody V1GetUploadUrlRequest request, @PathVariable String spaceId) {
+        authorizationService.authorize(requestHelper.buildNodeUploadRequest(spaceId));
         GetUploadUrlCommand command = restNodeMapper.toCommand(request, spaceId);
         UploadUrlInfo urlInfo = getUploadUrlInbound.execute(command);
         return restNodeMapper.toResponse(urlInfo);
@@ -51,28 +53,30 @@ public class NodeController implements NodeControllerSwagger {
     // TODO: продумать, нужен ли в методе spaceId, если nodeId уникальный. Решение или изменения в коде делать в рамках задачи: https://grinbog015.atlassian.net/browse/BZR-112
     @GetMapping("/{nodeId}/status")
     public V1GetFileStatusResponse getFileStatus(@PathVariable String spaceId, @PathVariable String nodeId) {
+        authorizationService.authorize(requestHelper.buildNodeReadRequest(spaceId));
         FileStatusInfo status = getFileStatusInbound.execute(nodeId);
         return restNodeMapper.toResponse(status);
     }
 
     @GetMapping
     public V1GetNodesPaginationResponse getNodes(@PathVariable String spaceId, @PageableDefault(size = 20) Pageable pageable) {
+        authorizationService.authorize(requestHelper.buildNodeReadRequest(spaceId));
         GetNodesBySpaceIdCommand command = restNodeMapper.toCommand(spaceId, pageable);
         NodeInfoPage nodeInfoPage = getNodesBySpaceIdInbound.execute(command);
         return restNodeMapper.toResponse(nodeInfoPage);
     }
 
     @GetMapping("/{nodeId}/download")
-    @Authorize(permission = Permission.NODES_DOWNLOAD)
     public V1GetDownloadUrlResponse getUrlForDownload(@PathVariable String spaceId, @PathVariable String nodeId) {
+        authorizationService.authorize(requestHelper.buildNodeDownloadRequest(spaceId, nodeId));
         DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(nodeId);
         return restNodeMapper.toResponse(urlInfo);
     }
 
     // TODO: то же самое что и в getFileStatus. Решение или изменения в коде делать в рамках задачи: https://grinbog015.atlassian.net/browse/BZR-112
     @DeleteMapping("/{nodeId}")
-    @Authorize(permission = Permission.NODES_DELETE)
     public void deleteNode(@PathVariable String spaceId, @PathVariable String nodeId) {
+        authorizationService.authorize(requestHelper.buildNodeDeleteRequest(spaceId, nodeId));
         markNodeForDeletionInbound.execute(nodeId);
     }
 }

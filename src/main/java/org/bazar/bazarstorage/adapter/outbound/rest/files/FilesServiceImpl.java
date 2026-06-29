@@ -37,7 +37,7 @@ public class FilesServiceImpl implements FilesService {
             return mapper.toUploadUrlInfo(response);
         } catch (FeignException e) {
             log.error("Error while calling files service to initiate upload: status {}, message {}", e.status(), e.getMessage());
-            throw new BusinessException(ErrorCode.TECH_ERROR);
+            throw new BusinessException(ErrorCode.TECHNICAL_ERROR);
         }
     }
 
@@ -47,7 +47,7 @@ public class FilesServiceImpl implements FilesService {
             return feignClient.initiateDownload(fileUuid.toString()).downloadUrl();
         } catch (FeignException e) {
             log.error("Error while calling files service to initiate download: status {}, message {}", e.status(), e.getMessage());
-            throw new BusinessException(ErrorCode.TECH_ERROR);
+            throw new BusinessException(ErrorCode.TECHNICAL_ERROR);
         }
     }
 
@@ -57,7 +57,7 @@ public class FilesServiceImpl implements FilesService {
             feignClient.deleteByFileUuid(fileUuid.toString());
         } catch (FeignException e) {
             log.error("Error while calling files service to delete file {}", fileUuid, e);
-            throw new BusinessException(ErrorCode.TECH_ERROR);
+            throw new BusinessException(ErrorCode.TECHNICAL_ERROR);
         }
     }
 }
