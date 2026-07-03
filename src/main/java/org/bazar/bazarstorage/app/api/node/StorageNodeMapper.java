@@ -1,14 +1,14 @@
 package org.bazar.bazarstorage.app.api.node;
 
-import org.bazar.bazarstorage.app.impl.node.commands.GetUploadUrlCommand;
-import org.bazar.bazarstorage.app.impl.node.output.AuthorInfo;
-import org.bazar.bazarstorage.app.impl.node.output.AuthorStatus;
-import org.bazar.bazarstorage.app.impl.node.output.DownloadUrlInfo;
-import org.bazar.bazarstorage.app.impl.node.output.FileStatusInfo;
-import org.bazar.bazarstorage.app.impl.node.output.InitiateUploadResult;
-import org.bazar.bazarstorage.app.impl.node.output.NodeInfo;
-import org.bazar.bazarstorage.app.impl.node.output.NodeInfoPage;
-import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
+import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
+import org.bazar.bazarstorage.app.api.node.output.AuthorInfo;
+import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
+import org.bazar.bazarstorage.app.api.node.output.DownloadUrlInfo;
+import org.bazar.bazarstorage.app.api.node.output.FileStatusInfo;
+import org.bazar.bazarstorage.app.api.node.output.InitiateUploadResult;
+import org.bazar.bazarstorage.app.api.node.output.NodeInfo;
+import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
+import org.bazar.bazarstorage.app.api.node.output.UploadUrlInfo;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.user.User;
 import org.mapstruct.Mapper;

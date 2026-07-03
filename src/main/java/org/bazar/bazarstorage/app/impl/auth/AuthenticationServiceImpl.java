@@ -1,5 +1,6 @@
-package org.bazar.bazarstorage.app.service;
+package org.bazar.bazarstorage.app.impl.auth;
 
+import org.bazar.bazarstorage.app.api.auth.AuthenticationService;
 import org.bazar.bazarstorage.app.api.exception.BusinessException;
 import org.bazar.bazarstorage.app.api.exception.ErrorCode;
 import org.springframework.security.core.Authentication;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class AuthenticationService {
+public class AuthenticationServiceImpl implements AuthenticationService {
     public UUID getAuthenticatedUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication instanceof JwtAuthenticationToken token)) {

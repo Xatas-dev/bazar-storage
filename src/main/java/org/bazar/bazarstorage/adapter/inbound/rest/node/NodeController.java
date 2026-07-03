@@ -11,14 +11,12 @@ import org.bazar.bazarstorage.app.api.node.GetDownloadUrlInbound;
 import org.bazar.bazarstorage.app.api.node.GetFileStatusInbound;
 import org.bazar.bazarstorage.app.api.node.GetNodesBySpaceIdInbound;
 import org.bazar.bazarstorage.app.api.node.GetUploadUrlInbound;
-import org.bazar.bazarstorage.app.impl.node.commands.GetNodesBySpaceIdCommand;
-import org.bazar.bazarstorage.app.impl.node.commands.GetUploadUrlCommand;
-import org.bazar.bazarstorage.app.impl.node.output.DownloadUrlInfo;
-import org.bazar.bazarstorage.app.impl.node.output.FileStatusInfo;
-import org.bazar.bazarstorage.app.impl.node.output.NodeInfoPage;
-import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
-import org.bazar.bazarstorage.app.service.AuthorizationService;
-import org.bazar.bazarstorage.app.impl.helper.AuthorizationRequestHelper;
+import org.bazar.bazarstorage.app.api.node.commands.GetNodesBySpaceIdCommand;
+import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
+import org.bazar.bazarstorage.app.api.node.output.DownloadUrlInfo;
+import org.bazar.bazarstorage.app.api.node.output.FileStatusInfo;
+import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
+import org.bazar.bazarstorage.app.api.node.output.UploadUrlInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,12 +37,9 @@ public class NodeController implements NodeControllerSwagger {
     private final GetNodesBySpaceIdInbound getNodesBySpaceIdInbound;
     private final GetDownloadUrlInbound getDownloadUrlInbound;
     private final MarkNodeForDeletionInbound markNodeForDeletionInbound;
-    private final AuthorizationService authorizationService;
-    private final AuthorizationRequestHelper requestHelper;
 
     @PostMapping
     public V1GetUploadUrlResponse getUploadUrl(@RequestBody V1GetUploadUrlRequest request, @PathVariable String spaceId) {
-        authorizationService.authorize(requestHelper.buildNodeUploadRequest(spaceId));
         GetUploadUrlCommand command = restNodeMapper.toCommand(request, spaceId);
         UploadUrlInfo urlInfo = getUploadUrlInbound.execute(command);
         return restNodeMapper.toResponse(urlInfo);
@@ -52,14 +47,12 @@ public class NodeController implements NodeControllerSwagger {
 
     @GetMapping("/{nodeId}/status")
     public V1GetFileStatusResponse getFileStatus(@PathVariable String spaceId, @PathVariable String nodeId) {
-        authorizationService.authorize(requestHelper.buildNodeReadRequest(spaceId));
-        FileStatusInfo status = getFileStatusInbound.execute(nodeId);
+        FileStatusInfo status = getFileStatusInbound.execute(spaceId, nodeId);
         return restNodeMapper.toResponse(status);
     }
 
     @GetMapping
     public V1GetNodesPaginationResponse getNodes(@PathVariable String spaceId, @PageableDefault(size = 20) Pageable pageable) {
-        authorizationService.authorize(requestHelper.buildNodeReadRequest(spaceId));
         GetNodesBySpaceIdCommand command = restNodeMapper.toCommand(spaceId, pageable);
         NodeInfoPage nodeInfoPage = getNodesBySpaceIdInbound.execute(command);
         return restNodeMapper.toResponse(nodeInfoPage);
@@ -67,14 +60,12 @@ public class NodeController implements NodeControllerSwagger {
 
     @GetMapping("/{nodeId}/download")
     public V1GetDownloadUrlResponse getUrlForDownload(@PathVariable String spaceId, @PathVariable String nodeId) {
-        authorizationService.authorize(requestHelper.buildNodeDownloadRequest(spaceId, nodeId));
         DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(nodeId);
         return restNodeMapper.toResponse(urlInfo);
     }
 
     @DeleteMapping("/{nodeId}")
     public void deleteNode(@PathVariable String spaceId, @PathVariable String nodeId) {
-        authorizationService.authorize(requestHelper.buildNodeDeleteRequest(spaceId, nodeId));
-        markNodeForDeletionInbound.execute(nodeId);
+        markNodeForDeletionInbound.execute(spaceId, nodeId);
     }
 }

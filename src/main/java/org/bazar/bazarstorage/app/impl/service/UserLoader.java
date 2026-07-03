@@ -1,4 +1,4 @@
-package org.bazar.bazarstorage.app.service;
+package org.bazar.bazarstorage.app.impl.service;
 
 import lombok.RequiredArgsConstructor;
 import org.bazar.bazarstorage.app.api.persona.PersonaService;

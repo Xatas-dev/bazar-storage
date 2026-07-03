@@ -82,6 +82,7 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.testcontainers:postgresql:1.21.0")
     testImplementation("org.wiremock:wiremock-standalone:3.10.0")
+    testImplementation("com.tngtech.archunit:archunit-junit5:1.2.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     //Other

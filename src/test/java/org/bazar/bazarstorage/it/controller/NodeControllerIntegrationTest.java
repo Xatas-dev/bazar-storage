@@ -8,7 +8,7 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPagination
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlRequest;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
-import org.bazar.bazarstorage.app.impl.node.output.AuthorStatus;
+import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +41,6 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     private static final String FILE_NAME_TOO_LARGE_MESSAGE = "Длина имени файла не может превышать 100 символов";
     private static final TypeReference<V1GetUploadUrlResponse> TYPE_REF_V1_POST_UPLOAD_URL_RESPONSE = new TypeReference<>() {};
     private static final TypeReference<List<String>> TYPE_REF_V1_POST_UPLOAD_URL_RESPONSE_VALIDATION_ERROR = new TypeReference<>() {};
-    private static final TypeReference<String> TYPE_REF_V1_POST_UPLOAD_URL_RESPONSE_AUTH_ERROR = new TypeReference<>() {};
     private static final TypeReference<V1GetFileStatusResponse> TYPE_REF_V1_GET_FILE_STATUS_RESPONSE = new TypeReference<>() {};
     private static final TypeReference<V1GetNodesPaginationResponse> TYPE_REF_V1_GET_NODES_PAGINATION_RESPONSE = new TypeReference<>() {};
     private static final TypeReference<V1GetDownloadUrlResponse> TYPE_REF_V1_GET_DOWNLOAD_URL_RESPONSE = new TypeReference<>() {};
@@ -195,7 +194,6 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
         );
 
         StorageNode deletedNode = storageNodeJpaRepository.findById(storageNode.getId()).orElse(null);
-
         assertNotNull(deletedNode);
         assertEquals(StorageNodeStatus.DELETED, deletedNode.getStatus());
     }
@@ -205,7 +203,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     void getUploadUrl_unauthorized() throws Exception {
         when(bazarAuthorizationClient.authorize(any())).thenReturn(false);
 
-        String result = restTestUtil.postPerform(
+        restTestUtil.postPerform(
                 String.format(POST_UPLOAD_URL_API_URL, SPACE_ID),
                 Map.of(),
                 new V1GetUploadUrlRequest(VALID_FILE_NAME, VALID_SIZE),

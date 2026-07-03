@@ -1,4 +1,4 @@
-package org.bazar.bazarstorage.adapter.inbound.rest.aop;
+package org.bazar.bazarstorage.app.api.auth;
 
 import org.bazar.authorization.sdk.Permission;
 
@@ -17,7 +17,7 @@ public @interface Authorize {
     Permission permission();
 
     /**
-     * Идентификатор пространства
+     * SpEL-выражение для получения идентификатора пространства
      */
-    String spaceIdParam() default "spaceId";
+    String spaceIdParam() default "#spaceId";
 }
