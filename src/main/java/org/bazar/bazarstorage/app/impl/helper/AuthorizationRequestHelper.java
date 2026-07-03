@@ -1,4 +1,4 @@
-package org.bazar.bazarstorage.app.util;
+package org.bazar.bazarstorage.app.impl.helper;
 
 import lombok.RequiredArgsConstructor;
 import org.bazar.authorization.sdk.AuthorizationRequest;
