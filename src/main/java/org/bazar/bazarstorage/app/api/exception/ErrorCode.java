@@ -6,15 +6,14 @@ import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
 public enum ErrorCode {
-    //Business
+    // Storage
     STORAGE_NODE_NOT_FOUND_BY_FILE_UUID(HttpStatus.NOT_FOUND, "Storage node not found for file UUID: %s"),
     STORAGE_NODE_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, "Storage node not found for ID: %s"),
+    // Auth
     NOT_AUTHENTICATED(HttpStatus.UNAUTHORIZED, "Not authenticated"),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Insufficient permissions for this action"),
-
-    //Server error
-    TECHNICAL_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "Technical error"),
-    AUTHORIZATION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Authorization error");
+    // Internal
+    INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Technical error");
 
     @Getter
     private final HttpStatus status;

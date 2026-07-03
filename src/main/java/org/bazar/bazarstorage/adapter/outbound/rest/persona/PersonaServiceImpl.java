@@ -4,8 +4,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bazar.bazarstorage.adapter.outbound.rest.persona.dto.GetUserResponseDto;
-import org.bazar.bazarstorage.app.api.exception.BusinessException;
-import org.bazar.bazarstorage.app.api.exception.ErrorCode;
+import org.bazar.bazarstorage.app.api.exception.InternalException;
 import org.bazar.bazarstorage.app.api.persona.PersonaService;
 import org.bazar.bazarstorage.domain.user.User;
 import org.bazar.bazarstorage.fw.CaffeineCacheConfig;
@@ -94,7 +93,7 @@ public class PersonaServiceImpl implements PersonaService {
                 return personaFeignClient.getUsers(userIds.stream().map(UUID::toString).toList());
             } catch (FeignException e) {
                 log.error("Error while calling persona service to get users: status {}, message {}", e.status(), e.getMessage());
-                throw new BusinessException(ErrorCode.TECHNICAL_ERROR);
+                throw new InternalException(e.getMessage());
             }
         }
         return List.of();

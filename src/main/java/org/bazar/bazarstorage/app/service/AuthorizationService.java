@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.bazar.authorization.sdk.AuthorizationRequest;
 import org.bazar.authorization.sdk.BazarAuthorizationClient;
 import org.bazar.bazarstorage.app.api.exception.BusinessException;
+import org.bazar.bazarstorage.app.api.exception.InternalException;
 import org.springframework.stereotype.Component;
 
-import static org.bazar.bazarstorage.app.api.exception.ErrorCode.AUTHORIZATION_ERROR;
 import static org.bazar.bazarstorage.app.api.exception.ErrorCode.FORBIDDEN;
 
 @Component
@@ -23,7 +23,7 @@ public class AuthorizationService {
             isAuthorized = bazarAuthorizationClient.authorize(request);
         } catch (Exception ex) {
             log.error("Error while calling auth service for spaceId={}", request.getSpaceId(), ex);
-            throw new BusinessException(AUTHORIZATION_ERROR);
+            throw new InternalException(ex.getMessage());
         }
 
         if (!isAuthorized) {
