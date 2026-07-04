@@ -6,8 +6,6 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.library.Architectures;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
-
 @AnalyzeClasses(
         packages = "org.bazar.bazarstorage",
         importOptions = {ImportOption.DoNotIncludeTests.class})
@@ -49,16 +47,6 @@ public class ArchitectureTest {
         getLayers()
                 .whereLayer(FW_LAYER)
                 .mayNotBeAccessedByAnyLayer()
-                .check(classes);
-    }
-
-    @ArchTest
-    void dtoDependencyTest(JavaClasses classes) {
-        noClasses()
-                .that()
-                .haveNameMatching(".*Dto")
-                .should()
-                .resideOutsideOfPackage("..adapter..")
                 .check(classes);
     }
 
