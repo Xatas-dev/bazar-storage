@@ -60,7 +60,7 @@ public class NodeController implements NodeControllerSwagger {
 
     @GetMapping("/{nodeId}/download")
     public V1GetDownloadUrlResponse getUrlForDownload(@PathVariable String spaceId, @PathVariable String nodeId) {
-        DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(nodeId);
+        DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(spaceId, nodeId);
         return restNodeMapper.toResponse(urlInfo);
     }
 

@@ -26,10 +26,10 @@ public class GetDownloadUrlUseCase implements GetDownloadUrlInbound {
     private final AuthorizationService authorizationService;
 
     @Override
-    public DownloadUrlInfo execute(String nodeId) {
+    public DownloadUrlInfo execute(String spaceId, String nodeId) {
         StorageNode storageNode = storageNodeRepository.findById(Long.parseLong(nodeId))
                 .orElseThrow(() -> new BusinessException(STORAGE_NODE_NOT_FOUND_BY_ID, nodeId));
-        checkDownloadPermissions(Long.parseLong(nodeId), storageNode);
+        checkDownloadPermissions(Long.parseLong(spaceId), storageNode);
         String downloadUrl = filesService.initiateDownload(storageNode.getFileUuid());
         return storageNodeMapper.toDownloadUrlInfo(downloadUrl);
     }

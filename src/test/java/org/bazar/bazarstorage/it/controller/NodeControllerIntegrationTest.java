@@ -207,7 +207,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
                 String.format(POST_UPLOAD_URL_API_URL, SPACE_ID),
                 Map.of(),
                 new V1GetUploadUrlRequest(VALID_FILE_NAME, VALID_SIZE),
-                TYPE_REF_V1_POST_UPLOAD_URL_RESPONSE_AUTH_ERROR,
+                TYPE_REF_STRING_RESPONSE,
                 Map.of(),
                 status().isForbidden()
         );
