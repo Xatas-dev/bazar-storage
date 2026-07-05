@@ -15,7 +15,7 @@ public class AuthorizationRequestBuilder {
     private static final String CREATED_BY_ATTRIBUTE = "created_by";
 
     public static AuthorizationRequest buildNodeDownloadRequest(Long spaceId, String bearerToken, StorageNode storageNode) {
-        Map<String, String> resourceAttributes = Map.of(CREATED_BY_ATTRIBUTE, storageNode.getCreatedAt().toString());
+        Map<String, String> resourceAttributes = Map.of(CREATED_BY_ATTRIBUTE, storageNode.getUserId().toString());
 
         return AuthorizationRequest.builder()
                 .spaceId(spaceId)
