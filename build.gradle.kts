@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.bazar"
-version = "1.0.0"
+version = "1.0.1"
 description = "bazar-storage"
 
 java {
