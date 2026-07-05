@@ -37,6 +37,9 @@ service:
     url: ${INTEGRATION_REST_BAZAR_FILES_API_URL}
   bazar-persona:
     url: ${INTEGRATION_REST_BAZAR_PERSONA_API_URL}
+  authorization:
+    port: ${INTEGRATION_REST_AUTHORIZATION_PORT}
+    host: ${INTEGRATION_REST_AUTHORIZATION_HOST}
 
 settings:
   file-validation:

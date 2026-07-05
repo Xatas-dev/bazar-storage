@@ -1,7 +1,7 @@
 package org.bazar.bazarstorage.app.api.files;
 
-import org.bazar.bazarstorage.app.impl.node.commands.GetUploadUrlCommand;
-import org.bazar.bazarstorage.app.impl.node.output.InitiateUploadResult;
+import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
+import org.bazar.bazarstorage.app.api.node.output.InitiateUploadResult;
 
 import java.util.UUID;
 

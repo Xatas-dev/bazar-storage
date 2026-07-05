@@ -31,3 +31,6 @@ service:
   bazar-persona:
     url: http://localhost:${service.bazar-persona.port}/api
     port: 8082
+  authorization:
+    port: 9090
+    host: localhost

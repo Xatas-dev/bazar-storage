@@ -1,7 +1,7 @@
 package org.bazar.bazarstorage.app.api.node;
 
-import org.bazar.bazarstorage.app.impl.node.output.FileStatusInfo;
+import org.bazar.bazarstorage.app.api.node.output.FileStatusInfo;
 
 public interface GetFileStatusInbound {
-    FileStatusInfo execute(String nodeId);
+    FileStatusInfo execute(String spaceId, String nodeId);
 }

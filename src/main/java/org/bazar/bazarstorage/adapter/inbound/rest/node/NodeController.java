@@ -11,12 +11,12 @@ import org.bazar.bazarstorage.app.api.node.GetDownloadUrlInbound;
 import org.bazar.bazarstorage.app.api.node.GetFileStatusInbound;
 import org.bazar.bazarstorage.app.api.node.GetNodesBySpaceIdInbound;
 import org.bazar.bazarstorage.app.api.node.GetUploadUrlInbound;
-import org.bazar.bazarstorage.app.impl.node.commands.GetNodesBySpaceIdCommand;
-import org.bazar.bazarstorage.app.impl.node.commands.GetUploadUrlCommand;
-import org.bazar.bazarstorage.app.impl.node.output.DownloadUrlInfo;
-import org.bazar.bazarstorage.app.impl.node.output.FileStatusInfo;
-import org.bazar.bazarstorage.app.impl.node.output.NodeInfoPage;
-import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
+import org.bazar.bazarstorage.app.api.node.commands.GetNodesBySpaceIdCommand;
+import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
+import org.bazar.bazarstorage.app.api.node.output.DownloadUrlInfo;
+import org.bazar.bazarstorage.app.api.node.output.FileStatusInfo;
+import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
+import org.bazar.bazarstorage.app.api.node.output.UploadUrlInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,10 +45,9 @@ public class NodeController implements NodeControllerSwagger {
         return restNodeMapper.toResponse(urlInfo);
     }
 
-    // TODO: продумать, нужен ли в методе spaceId, если nodeId уникальный. Решение или изменения в коде делать в рамках задачи: https://grinbog015.atlassian.net/browse/BZR-112
     @GetMapping("/{nodeId}/status")
     public V1GetFileStatusResponse getFileStatus(@PathVariable String spaceId, @PathVariable String nodeId) {
-        FileStatusInfo status = getFileStatusInbound.execute(nodeId);
+        FileStatusInfo status = getFileStatusInbound.execute(spaceId, nodeId);
         return restNodeMapper.toResponse(status);
     }
 
@@ -61,13 +60,12 @@ public class NodeController implements NodeControllerSwagger {
 
     @GetMapping("/{nodeId}/download")
     public V1GetDownloadUrlResponse getUrlForDownload(@PathVariable String spaceId, @PathVariable String nodeId) {
-        DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(nodeId);
+        DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(spaceId, nodeId);
         return restNodeMapper.toResponse(urlInfo);
     }
 
-    // TODO: то же самое что и в getFileStatus. Решение или изменения в коде делать в рамках задачи: https://grinbog015.atlassian.net/browse/BZR-112
     @DeleteMapping("/{nodeId}")
     public void deleteNode(@PathVariable String spaceId, @PathVariable String nodeId) {
-        markNodeForDeletionInbound.execute(nodeId);
+        markNodeForDeletionInbound.execute(spaceId, nodeId);
     }
 }

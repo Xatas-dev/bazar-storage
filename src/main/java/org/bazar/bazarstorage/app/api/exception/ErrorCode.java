@@ -1,21 +1,23 @@
 package org.bazar.bazarstorage.app.api.exception;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+@RequiredArgsConstructor
 public enum ErrorCode {
-    TECH_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "Technical error"),
+    // Storage
     STORAGE_NODE_NOT_FOUND_BY_FILE_UUID(HttpStatus.NOT_FOUND, "Storage node not found for file UUID: %s"),
-    STORAGE_NODE_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, "Storage node not found for ID: %s");
+    STORAGE_NODE_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, "Storage node not found for ID: %s"),
+    // Auth
+    NOT_AUTHENTICATED(HttpStatus.UNAUTHORIZED, "Not authenticated"),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "Insufficient permissions for this action"),
+    // Internal
+    INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Technical error");
 
     @Getter
     private final HttpStatus status;
     private final String messageTemplate;
-
-    ErrorCode(HttpStatus status, String messageTemplate) {
-        this.status = status;
-        this.messageTemplate = messageTemplate;
-    }
 
     public String formatMessage(Object... args) {
         return String.format(messageTemplate, args);

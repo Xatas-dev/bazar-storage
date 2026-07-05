@@ -1,4 +1,4 @@
-package org.bazar.bazarstorage.app.api;
+package org.bazar.bazarstorage.app.api.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
