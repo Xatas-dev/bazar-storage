@@ -5,12 +5,12 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusRespo
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlRequest;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
-import org.bazar.bazarstorage.app.impl.node.commands.GetNodesBySpaceIdCommand;
-import org.bazar.bazarstorage.app.impl.node.commands.GetUploadUrlCommand;
-import org.bazar.bazarstorage.app.impl.node.output.DownloadUrlInfo;
-import org.bazar.bazarstorage.app.impl.node.output.FileStatusInfo;
-import org.bazar.bazarstorage.app.impl.node.output.NodeInfoPage;
-import org.bazar.bazarstorage.app.impl.node.output.UploadUrlInfo;
+import org.bazar.bazarstorage.app.api.node.commands.GetNodesBySpaceIdCommand;
+import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
+import org.bazar.bazarstorage.app.api.node.output.DownloadUrlInfo;
+import org.bazar.bazarstorage.app.api.node.output.FileStatusInfo;
+import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
+import org.bazar.bazarstorage.app.api.node.output.UploadUrlInfo;
 import org.mapstruct.Mapper;
 import org.springframework.data.domain.Pageable;
 

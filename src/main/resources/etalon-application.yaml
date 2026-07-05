@@ -22,6 +22,7 @@ settings:
     delete-marked-files:
       cron: "*/10 * * * * *"
       batch-size: 2
+      retention-days: 7
 
 service:
   bazar-files:
@@ -30,3 +31,6 @@ service:
   bazar-persona:
     url: http://localhost:${service.bazar-persona.port}/api
     port: 8082
+  authorization:
+    port: 9090
+    host: localhost

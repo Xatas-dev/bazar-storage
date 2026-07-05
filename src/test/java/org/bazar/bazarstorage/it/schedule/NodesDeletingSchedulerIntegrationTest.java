@@ -30,10 +30,10 @@ public class NodesDeletingSchedulerIntegrationTest extends AbstractIntegrationTe
 
         List<StorageNode> resultAfterScheduler = storageNodeJpaRepository.findAll();
         assertEquals(2, resultAfterScheduler.size());
-        List<StorageNode> deletedNodes = resultAfterScheduler.stream()
+        List<StorageNode> nodesMarkedDeleted = resultAfterScheduler.stream()
                 .filter(node -> node.getStatus() == StorageNodeStatus.DELETED)
                 .toList();
-        assertEquals(0, deletedNodes.size());
+        assertEquals(0, nodesMarkedDeleted.size());
     }
 
     @Test
@@ -44,10 +44,10 @@ public class NodesDeletingSchedulerIntegrationTest extends AbstractIntegrationTe
 
         List<StorageNode> resultAfterScheduler = storageNodeJpaRepository.findAll();
         assertEquals(4, resultAfterScheduler.size());
-        List<StorageNode> deletedNodes = resultAfterScheduler.stream()
+        List<StorageNode> nodesMarkedDeleted = resultAfterScheduler.stream()
                 .filter(node -> node.getStatus() == StorageNodeStatus.DELETED)
                 .toList();
-        assertEquals(2, deletedNodes.size());
+        assertEquals(2, nodesMarkedDeleted.size());
     }
 
     // =================================================================================================================

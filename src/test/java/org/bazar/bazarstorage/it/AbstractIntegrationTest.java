@@ -1,5 +1,6 @@
 package org.bazar.bazarstorage.it;
 
+import org.bazar.authorization.sdk.BazarAuthorizationClient;
 import org.bazar.bazarstorage.adapter.outbound.persistence.storagenode.StorageNodeJpaRepository;
 import org.bazar.bazarstorage.fw.BazarStorageApplication;
 import org.bazar.bazarstorage.it.testutil.TestDataHelper;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -31,6 +33,8 @@ public abstract class AbstractIntegrationTest {
     protected TestDataHelper testDataHelper;
     @Autowired
     protected StorageNodeJpaRepository storageNodeJpaRepository;
+    @MockitoBean
+    protected BazarAuthorizationClient bazarAuthorizationClient;
 
     @BeforeEach
     void cleanUp() {

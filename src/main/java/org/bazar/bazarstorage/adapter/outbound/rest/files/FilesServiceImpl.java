@@ -4,11 +4,10 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bazar.bazarstorage.adapter.outbound.rest.files.dto.V1InitiateUploadResponseDto;
-import org.bazar.bazarstorage.app.api.exception.BusinessException;
-import org.bazar.bazarstorage.app.api.exception.ErrorCode;
+import org.bazar.bazarstorage.app.api.exception.InternalException;
 import org.bazar.bazarstorage.app.api.files.FilesService;
-import org.bazar.bazarstorage.app.impl.node.commands.GetUploadUrlCommand;
-import org.bazar.bazarstorage.app.impl.node.output.InitiateUploadResult;
+import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
+import org.bazar.bazarstorage.app.api.node.output.InitiateUploadResult;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 import org.springframework.stereotype.Component;
@@ -37,7 +36,7 @@ public class FilesServiceImpl implements FilesService {
             return mapper.toUploadUrlInfo(response);
         } catch (FeignException e) {
             log.error("Error while calling files service to initiate upload: status {}, message {}", e.status(), e.getMessage());
-            throw new BusinessException(ErrorCode.TECH_ERROR);
+            throw new InternalException(e.getMessage());
         }
     }
 
@@ -47,7 +46,7 @@ public class FilesServiceImpl implements FilesService {
             return feignClient.initiateDownload(fileUuid.toString()).downloadUrl();
         } catch (FeignException e) {
             log.error("Error while calling files service to initiate download: status {}, message {}", e.status(), e.getMessage());
-            throw new BusinessException(ErrorCode.TECH_ERROR);
+            throw new InternalException(e.getMessage());
         }
     }
 
@@ -57,7 +56,7 @@ public class FilesServiceImpl implements FilesService {
             feignClient.deleteByFileUuid(fileUuid.toString());
         } catch (FeignException e) {
             log.error("Error while calling files service to delete file {}", fileUuid, e);
-            throw new BusinessException(ErrorCode.TECH_ERROR);
+            throw new InternalException(e.getMessage());
         }
     }
 }

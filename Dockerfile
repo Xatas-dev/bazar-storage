@@ -3,6 +3,9 @@
 # ==========================================
 FROM gradle:9.2.1-jdk21 AS builder
 
+ARG GITHUB_TOKEN
+ARG GITHUB_ACTOR
+
 WORKDIR /app
 
 # Copy gradle configuration first to cache dependencies
@@ -10,7 +13,7 @@ COPY build.gradle.kts settings.gradle.kts ./
 COPY gradle ./gradle
 
 COPY src ./src
-RUN gradle bootJar -x test --no-daemon
+RUN GITHUB_TOKEN=${GITHUB_TOKEN} GITHUB_ACTOR=${GITHUB_ACTOR} gradle bootJar
 
 # Extract layers for optimization
 # This splits the fat jar into dependencies, loader, and application code

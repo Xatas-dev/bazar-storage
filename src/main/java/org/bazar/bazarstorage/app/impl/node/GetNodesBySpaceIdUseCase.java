@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.bazar.bazarstorage.app.api.node.GetNodesBySpaceIdInbound;
 import org.bazar.bazarstorage.app.api.node.StorageNodeMapper;
 import org.bazar.bazarstorage.app.api.node.StorageNodeRepository;
-import org.bazar.bazarstorage.app.impl.node.commands.GetNodesBySpaceIdCommand;
-import org.bazar.bazarstorage.app.impl.node.output.AuthorStatus;
-import org.bazar.bazarstorage.app.impl.node.output.NodeInfo;
-import org.bazar.bazarstorage.app.impl.node.output.NodeInfoPage;
-import org.bazar.bazarstorage.app.service.UserLoader;
+import org.bazar.bazarstorage.app.api.node.commands.GetNodesBySpaceIdCommand;
+import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
+import org.bazar.bazarstorage.app.api.node.output.NodeInfo;
+import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
+import org.bazar.bazarstorage.app.api.auth.Authorize;
+import org.bazar.bazarstorage.app.impl.service.UserLoader;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.bazar.bazarstorage.domain.user.User;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.bazar.authorization.sdk.Permission.STORAGE_NODE_READ;
+
 @Component
 @RequiredArgsConstructor
 public class GetNodesBySpaceIdUseCase implements GetNodesBySpaceIdInbound {
@@ -31,6 +34,7 @@ public class GetNodesBySpaceIdUseCase implements GetNodesBySpaceIdInbound {
     private final StorageNodeMapper storageNodeMapper;
 
     @Override
+    @Authorize(spaceIdParam = "#command.spaceId", permission = STORAGE_NODE_READ)
     public NodeInfoPage execute(GetNodesBySpaceIdCommand command) {
         Page<StorageNode> storageNodes =
                 storageNodeRepository.findBySpaceIdAndStatus(command.spaceId(), StorageNodeStatus.UPLOADED, normalize(command.pageable()));

@@ -1,4 +1,4 @@
-package org.bazar.bazarstorage.app.impl.node.output;
+package org.bazar.bazarstorage.app.api.node.output;
 
 import org.bazar.bazarstorage.domain.user.User;
 

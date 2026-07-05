@@ -1,10 +1,13 @@
 package org.bazar.bazarstorage.adapter.inbound.rest;
 
 import org.bazar.bazarstorage.app.api.exception.BusinessException;
+import org.bazar.bazarstorage.app.api.exception.InternalException;
 import org.bazar.bazarstorage.app.api.node.exception.FileValidationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import static org.bazar.bazarstorage.app.api.exception.ErrorCode.INTERNAL_ERROR;
 
 @RestControllerAdvice
 public class RestExceptionHandler {
@@ -19,5 +22,12 @@ public class RestExceptionHandler {
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(e.getMessage());
+    }
+
+    @ExceptionHandler(InternalException.class)
+    public ResponseEntity<Object> handleInternalException(InternalException e) {
+        return ResponseEntity
+                .status(INTERNAL_ERROR.getStatus())
+                .body(INTERNAL_ERROR.formatMessage());
     }
 }

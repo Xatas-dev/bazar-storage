@@ -1,4 +1,4 @@
-package org.bazar.bazarstorage.app.impl.node.commands;
+package org.bazar.bazarstorage.app.api.node.commands;
 
 import org.springframework.data.domain.Pageable;
 

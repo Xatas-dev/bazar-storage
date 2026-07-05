@@ -5,6 +5,7 @@ import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +18,7 @@ public interface StorageNodeRepository {
 
     Optional<StorageNode> findById(Long nodeId);
 
-    List<StorageNode> findDeletedNodesAfterId(Long lastId, Integer batch);
+    List<StorageNode> findDeletedNodesAfterIdWithRetention(Long lastId, Instant retentionThreshold, Integer batchSize);
 
     void deleteAllByIds(List<Long> ids);
 }

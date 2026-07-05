@@ -37,6 +37,9 @@ service:
     url: ${INTEGRATION_REST_BAZAR_FILES_API_URL}
   bazar-persona:
     url: ${INTEGRATION_REST_BAZAR_PERSONA_API_URL}
+  authorization:
+    port: ${INTEGRATION_REST_AUTHORIZATION_PORT}
+    host: ${INTEGRATION_REST_AUTHORIZATION_HOST}
 
 settings:
   file-validation:
@@ -47,3 +50,4 @@ settings:
     delete-marked-files:
       cron: ${SETTING_SCHEDULE_DELETE_MARKED_FILES_CRON}
       batch-size: ${SETTING_SCHEDULE_DELETE_MARKED_FILES_BATCH_SIZE}
+      retention-days: ${SETTING_SCHEDULE_DELETE_MARKED_FILES_RETENTION_DAYS}

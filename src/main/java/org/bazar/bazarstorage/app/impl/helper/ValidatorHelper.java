@@ -1,7 +1,8 @@
 package org.bazar.bazarstorage.app.impl.helper;
 
 import lombok.RequiredArgsConstructor;
-import org.bazar.bazarstorage.app.api.SettingProperties;
+import org.bazar.bazarstorage.app.api.properties.SettingProperties;
+import org.bazar.bazarstorage.app.api.properties.SettingProperties.FileValidation.ErrorType;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class ValidatorHelper {
     private final SettingProperties settingProperties;
 
-    public String getErrorMessage(SettingProperties.FileValidation.ErrorType errorType) {
-        return settingProperties.getFileValidation().getErrorMessages().get(errorType);
+    public String getErrorMessage(ErrorType errorType) {
+        return settingProperties.fileValidation().errorMessages().get(errorType);
     }
 }
