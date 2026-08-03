@@ -1,21 +1,21 @@
 package org.bazar.bazarstorage.domain.storagenode;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.bazar.bazarstorage.domain.DomainObject;
 
+/**
+ * Ошибка узла хранилища
+ */
 @Getter
 @Setter
-@Entity
-@Table(name = "storage_node_error")
-public class StorageNodeError extends DomainObject {
-    @ManyToOne(fetch = FetchType.LAZY)
-    private StorageNode storageNode;
-
-    @Column(name = "error_code")
+public class StorageNodeError {
+    /**
+     * Код ошибки
+     */
     private String errorCode;
 
-    @Column(name = "description")
+    /**
+     * Описание ошибки
+     */
     private String description;
 }
