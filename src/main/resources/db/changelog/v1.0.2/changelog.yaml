@@ -1,4 +1,4 @@
 databaseChangeLog:
   - include:
-      file: 001-create-storage-node-error-table.sql
+      file: 001-add-storage-node-errors-column.sql
       relativeToChangelogFile: true
