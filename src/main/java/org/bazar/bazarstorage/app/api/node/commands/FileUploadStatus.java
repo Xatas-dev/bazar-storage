@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum FileUploadStatus {
     UPLOADED,
     ERROR,
+    VALIDATION_ERROR,
     UNKNOWN;
 
     @JsonValue

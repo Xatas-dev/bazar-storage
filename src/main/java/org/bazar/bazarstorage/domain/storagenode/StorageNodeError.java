@@ -12,7 +12,7 @@ public class StorageNodeError {
     /**
      * Код ошибки
      */
-    private String errorCode;
+    private String code;
 
     /**
      * Описание ошибки
