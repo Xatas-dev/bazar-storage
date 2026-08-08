@@ -10,6 +10,7 @@ import org.bazar.bazarstorage.app.api.node.StorageNodeRepository;
 import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
 import org.bazar.bazarstorage.app.api.node.exception.FileValidationException;
 import org.bazar.bazarstorage.app.api.node.output.InitiateUploadResult;
+import org.bazar.bazarstorage.app.api.node.output.NodeErrorInfo;
 import org.bazar.bazarstorage.app.api.node.output.UploadUrlInfo;
 import org.bazar.bazarstorage.app.api.properties.SettingProperties;
 import org.bazar.bazarstorage.app.impl.helper.FilesHelper;
@@ -39,7 +40,7 @@ public class GetUploadUrlUseCase implements GetUploadUrlInbound {
     @Override
     @Authorize(spaceIdParam = "#command.spaceId", permission = STORAGE_NODE_UPLOAD)
     public UploadUrlInfo execute(GetUploadUrlCommand command) {
-        List<String> validationErrors = validateFile(command);
+        List<NodeErrorInfo> validationErrors = validateFile(command);
         if (!validationErrors.isEmpty()) {
             log.error("Validation errors: {}", validationErrors);
             throw new FileValidationException(validationErrors);
@@ -58,20 +59,20 @@ public class GetUploadUrlUseCase implements GetUploadUrlInbound {
     // =================================================================================================================
 
     // TODO: подумать над вынесением в отдельный класс с последующим расширением под валидацию папок. Будет реализовано в рамках стори https://grinbog015.atlassian.net/browse/BZR-104
-    private List<String> validateFile(GetUploadUrlCommand command) {
-        List<String> validationErrors = new ArrayList<>();
+    private List<NodeErrorInfo> validateFile(GetUploadUrlCommand command) {
+        List<NodeErrorInfo> validationErrors = new ArrayList<>();
         Long maxFileSize = settingProperties.fileValidation().maxFileSize();
         Integer maxFileNameLength = settingProperties.fileValidation().maxFileNameLength();
         String extension = FilesHelper.getExtension(command.fileName());
 
         if (command.size() > maxFileSize) {
-            validationErrors.add(String.format(validatorHelper.getErrorMessage(FILE_TOO_LARGE), maxFileSize));
+            validationErrors.add(validatorHelper.generateNodeErrorInfo(FILE_TOO_LARGE, maxFileSize));
         }
         if (settingProperties.fileValidation().notAllowedExtensions().contains(extension)) {
-            validationErrors.add(String.format(validatorHelper.getErrorMessage(FILE_EXTENSION_NOT_ALLOWED), extension));
+            validationErrors.add(validatorHelper.generateNodeErrorInfo(FILE_EXTENSION_NOT_ALLOWED, extension));
         }
         if (command.fileName().length() > maxFileNameLength) {
-            validationErrors.add(String.format(validatorHelper.getErrorMessage(FILE_NAME_TOO_LARGE), maxFileNameLength));
+            validationErrors.add(validatorHelper.generateNodeErrorInfo(FILE_NAME_TOO_LARGE, maxFileNameLength));
         }
         return validationErrors;
     }
