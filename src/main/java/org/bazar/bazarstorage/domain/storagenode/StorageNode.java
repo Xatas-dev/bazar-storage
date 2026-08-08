@@ -43,6 +43,6 @@ public class StorageNode extends DomainObject {
     private UUID userId;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "storage_node_errors", columnDefinition = "jsonb")
-    private List<StorageNodeError> storageNodeErrors;
+    @Column(name = "errors", columnDefinition = "jsonb")
+    private List<StorageNodeError> errors;
 }

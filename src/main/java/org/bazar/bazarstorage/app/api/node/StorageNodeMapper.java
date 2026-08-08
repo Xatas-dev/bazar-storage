@@ -1,5 +1,6 @@
 package org.bazar.bazarstorage.app.api.node;
 
+import org.bazar.bazarstorage.app.api.node.commands.FileUploadResultCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
 import org.bazar.bazarstorage.app.api.node.output.AuthorInfo;
 import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
@@ -9,16 +10,24 @@ import org.bazar.bazarstorage.app.api.node.output.InitiateUploadResult;
 import org.bazar.bazarstorage.app.api.node.output.NodeInfo;
 import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
 import org.bazar.bazarstorage.app.api.node.output.UploadUrlInfo;
+import org.bazar.bazarstorage.app.api.properties.SettingProperties;
+import org.bazar.bazarstorage.app.api.properties.SettingProperties.FileValidation.ErrorType;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeError;
 import org.bazar.bazarstorage.domain.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 
 import java.util.UUID;
 
 @Mapper
-public interface StorageNodeMapper {
+public abstract class StorageNodeMapper {
+    @Autowired
+    protected SettingProperties settingProperties;
+
     @Mapping(target = "nodeName", source = "command.fileName")
     @Mapping(target = "status", expression = "java(org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus.IN_PROGRESS)")
     @Mapping(target = "type", expression = "java(org.bazar.bazarstorage.domain.storagenode.StorageNodeType.FILE)")
@@ -26,17 +35,18 @@ public interface StorageNodeMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "parent", ignore = true)
-    StorageNode toDomain(GetUploadUrlCommand command, InitiateUploadResult uploadUrlInfo, UUID userId);
+    @Mapping(target = "errors", ignore = true)
+    public abstract StorageNode toDomain(GetUploadUrlCommand command, InitiateUploadResult uploadUrlInfo, UUID userId);
 
     @Mapping(target = "fileName", source = "storageNode.nodeName")
     @Mapping(target = "uploadedAt", source = "storageNode.createdAt")
     @Mapping(target = "author", expression = "java(toAuthorInfo(user, status))")
     @Mapping(target = "nodeId", source = "storageNode.id")
-    NodeInfo toNodeInfo(StorageNode storageNode, User user, AuthorStatus status);
+    public abstract NodeInfo toNodeInfo(StorageNode storageNode, User user, AuthorStatus status);
 
-    AuthorInfo toAuthorInfo(User user, AuthorStatus status);
+    public abstract AuthorInfo toAuthorInfo(User user, AuthorStatus status);
 
-    default NodeInfoPage toNodeInfoPage(Page<NodeInfo> dtoPage) {
+    public NodeInfoPage toNodeInfoPage(Page<NodeInfo> dtoPage) {
         return new NodeInfoPage(
                 dtoPage.getContent(),
                 dtoPage.getNumber(),
@@ -47,12 +57,27 @@ public interface StorageNodeMapper {
     }
 
     @Mapping(target = "author", expression = "java(toAuthorInfo(user, authorStatus))")
-    FileStatusInfo toFileStatusInfo(String status, User user, AuthorStatus authorStatus);
+    @Mapping(target = "errors", ignore = true)
+    public abstract FileStatusInfo toFileStatusInfo(String status, User user, AuthorStatus authorStatus);
 
     @Mapping(target = "author", ignore = true)
-    FileStatusInfo toFileStatusInfo(String status);
+    @Mapping(target = "errors", ignore = true)
+    public abstract FileStatusInfo toFileStatusInfo(String status);
 
-    DownloadUrlInfo toDownloadUrlInfo(String downloadUrl);
+    @Mapping(target = "author", ignore = true)
+    public abstract FileStatusInfo toFileStatusInfo(StorageNode storageNode);
 
-    UploadUrlInfo toUploadUrlInfo(InitiateUploadResult initiateUploadResult, String nodeId);
+    @Mapping(target = "description", source = "storageNodeError.code", qualifiedByName = "mapErrorDescription")
+    public abstract FileStatusInfo.Error toFileStatusError(StorageNodeError storageNodeError);
+
+    public abstract DownloadUrlInfo toDownloadUrlInfo(String downloadUrl);
+
+    public abstract UploadUrlInfo toUploadUrlInfo(InitiateUploadResult initiateUploadResult, String nodeId);
+
+    public abstract StorageNodeError toStorageNodeError(FileUploadResultCommand.Error error);
+
+    @Named("mapErrorDescription")
+    protected String mapErrorDescription(String code) {
+        return settingProperties.fileValidation().errorMessages().get(ErrorType.fromString(code));
+    }
 }
