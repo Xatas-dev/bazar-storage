@@ -7,6 +7,7 @@ import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
 import org.bazar.bazarstorage.app.api.node.output.DownloadUrlInfo;
 import org.bazar.bazarstorage.app.api.node.output.FileStatusInfo;
 import org.bazar.bazarstorage.app.api.node.output.InitiateUploadResult;
+import org.bazar.bazarstorage.app.api.node.output.NodeErrorInfo;
 import org.bazar.bazarstorage.app.api.node.output.NodeInfo;
 import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
 import org.bazar.bazarstorage.app.api.node.output.UploadUrlInfo;
@@ -68,7 +69,7 @@ public abstract class StorageNodeMapper {
     public abstract FileStatusInfo toFileStatusInfo(StorageNode storageNode);
 
     @Mapping(target = "description", source = "storageNodeError.code", qualifiedByName = "mapErrorDescription")
-    public abstract FileStatusInfo.Error toFileStatusError(StorageNodeError storageNodeError);
+    public abstract NodeErrorInfo toFileStatusError(StorageNodeError storageNodeError);
 
     public abstract DownloadUrlInfo toDownloadUrlInfo(String downloadUrl);
 
