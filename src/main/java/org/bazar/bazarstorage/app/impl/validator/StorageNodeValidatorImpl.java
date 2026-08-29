@@ -27,10 +27,10 @@ public class StorageNodeValidatorImpl implements StorageNodeValidator {
         Integer maxFileNameLength = settingProperties.fileValidation().maxFileNameLength();
 
         if (request.getSize() > maxFileSize) {
-            validationErrors.add(validatorHelper.generateNodeErrorInfo(FILE_TOO_LARGE, maxFileSize));
+            validationErrors.add(validatorHelper.generateNodeErrorInfo(FILE_TOO_LARGE, maxFileSize / 1024 / 1024));
         }
         if (settingProperties.fileValidation().notAllowedExtensions().contains(request.getExtension())) {
-            validationErrors.add(validatorHelper.generateNodeErrorInfo(FILE_EXTENSION_NOT_ALLOWED, request.getExtension()));
+            validationErrors.add(validatorHelper.generateNodeErrorInfo(FILE_EXTENSION_NOT_ALLOWED));
         }
         if (request.getNodeName().length() > maxFileNameLength) {
             validationErrors.add(validatorHelper.generateNodeErrorInfo(FILE_NAME_TOO_LARGE, maxFileNameLength));
