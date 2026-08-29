@@ -7,6 +7,8 @@ public record FileUploadResultCommand(
     Long size,
     String fileUuid,
     FileUploadStatus status,
+    String fileName,
+    String contentType,
     List<Error> errors
 ) {
     public record Error(

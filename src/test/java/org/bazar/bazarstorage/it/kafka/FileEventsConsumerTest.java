@@ -6,7 +6,6 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.producer.Producer;
 import org.bazar.bazarstorage.app.api.node.commands.FileUploadStatus;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
-import org.bazar.bazarstorage.domain.storagenode.StorageNodeError;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,9 +20,14 @@ import java.util.UUID;
 
 import static org.awaitility.Awaitility.await;
 import static org.bazar.bazarstorage.it.kafka.AbstractKafkaIntegrationTest.FILE_EVENTS_TOPIC;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @EmbeddedKafka(partitions = 1, topics = {FILE_EVENTS_TOPIC})
 public class FileEventsConsumerTest extends AbstractKafkaIntegrationTest {
+    private final static Long BIG_SIZE = 1000000000L;
+    private final static String LONG_FILE_NAME = "name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1.txt";
+    private final static String INVALID_CONTENT_TYPE = "application/bat";
+
     @Autowired
     private EmbeddedKafkaBroker embeddedKafka;
 
@@ -50,9 +54,11 @@ public class FileEventsConsumerTest extends AbstractKafkaIntegrationTest {
                 .until(() -> {
                     StorageNode storageNodeResult =
                             storageNodeJpaRepository.findByFileUuid(storageNode.getFileUuid()).get();
-                    return StorageNodeStatus.UPLOADED == storageNodeResult.getStatus() &&
-                            FileUploadResultCommandBuilder.DEFAULT_SIZE.equals(storageNodeResult.getSize());
+                    return StorageNodeStatus.UPLOADED == storageNodeResult.getStatus();
                 });
+        StorageNode result = storageNodeJpaRepository.findByFileUuid(storageNode.getFileUuid()).orElseThrow();
+        assertEquals(FileUploadResultCommandBuilder.DEFAULT_SIZE, result.getSize());
+        assertEquals(FileUploadResultCommandBuilder.DEFAULT_FILE_NAME, result.getNodeName());
     }
 
     @Test
@@ -70,9 +76,11 @@ public class FileEventsConsumerTest extends AbstractKafkaIntegrationTest {
                 .until(() -> {
                     StorageNode storageNodeResult =
                             storageNodeJpaRepository.findByFileUuid(storageNode.getFileUuid()).get();
-                    return StorageNodeStatus.ERROR == storageNodeResult.getStatus() &&
-                            FileUploadResultCommandBuilder.DEFAULT_SIZE.equals(storageNodeResult.getSize());
+                    return StorageNodeStatus.ERROR == storageNodeResult.getStatus();
                 });
+        StorageNode result = storageNodeJpaRepository.findByFileUuid(storageNode.getFileUuid()).orElseThrow();
+        assertEquals(FileUploadResultCommandBuilder.DEFAULT_SIZE, result.getSize());
+        assertEquals(FileUploadResultCommandBuilder.DEFAULT_FILE_NAME, result.getNodeName());
     }
 
     @Test
@@ -87,13 +95,33 @@ public class FileEventsConsumerTest extends AbstractKafkaIntegrationTest {
         await()
                 .atMost(Duration.ofSeconds(10))
                 .pollInterval(Duration.ofMillis(200))
-                .until(() -> {
-                    StorageNode storageNodeResult =
-                            storageNodeJpaRepository.findByFileUuid(storageNode.getFileUuid()).get();
-                    List<StorageNodeError> errors = storageNodeResult.getErrors();
-                    return StorageNodeStatus.ERROR == storageNodeResult.getStatus() &&
-                            FileUploadResultCommandBuilder.DEFAULT_SIZE.equals(storageNodeResult.getSize()) &&
-                            errors.size() == 3;
-                });
+                .until(() -> storageNodeJpaRepository.findByFileUuid(storageNode.getFileUuid())
+                        .map(StorageNode::getStatus)
+                        .orElse(null) == StorageNodeStatus.ERROR);
+        StorageNode result = storageNodeJpaRepository.findByFileUuid(storageNode.getFileUuid()).orElseThrow();
+        assertEquals(3, result.getErrors().size());
+        assertEquals(FileUploadResultCommandBuilder.DEFAULT_SIZE, result.getSize());
+        assertEquals(FileUploadResultCommandBuilder.DEFAULT_FILE_NAME, result.getNodeName());
+    }
+
+    @Test
+    @DisplayName("Обработка файла с валидационными ошибками на стороне bazar-storage")
+    void handle_bazarStorageValidationErrors() throws JsonProcessingException {
+        StorageNode storageNode = testDataHelper.createStorageNodeWith(
+                UUID.fromString(FileUploadResultCommandBuilder.DEFAULT_FILE_UUID), StorageNodeStatus.IN_PROGRESS);
+
+        sendMessage(kafkaConsumer, kafkaProducer, FILE_EVENTS_TOPIC, "",
+                FileUploadResultCommandBuilder.buildWith(BIG_SIZE, LONG_FILE_NAME, INVALID_CONTENT_TYPE));
+
+        await()
+                .atMost(Duration.ofSeconds(10))
+                .pollInterval(Duration.ofMillis(200))
+                .until(() -> storageNodeJpaRepository.findByFileUuid(storageNode.getFileUuid())
+                        .map(StorageNode::getStatus)
+                        .orElse(null) == StorageNodeStatus.ERROR);
+        StorageNode result = storageNodeJpaRepository.findByFileUuid(storageNode.getFileUuid()).orElseThrow();
+        assertEquals(3, result.getErrors().size());
+        assertEquals(BIG_SIZE, result.getSize());
+        assertEquals(LONG_FILE_NAME, result.getNodeName());
     }
 }

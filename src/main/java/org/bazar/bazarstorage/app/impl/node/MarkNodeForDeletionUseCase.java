@@ -1,6 +1,5 @@
 package org.bazar.bazarstorage.app.impl.node;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bazar.bazarstorage.app.api.node.MarkNodeForDeletionInbound;
@@ -10,6 +9,7 @@ import org.bazar.bazarstorage.app.api.auth.Authorize;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.bazar.authorization.sdk.Permission.*;
 

@@ -13,6 +13,7 @@ import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
 import org.bazar.bazarstorage.app.api.node.output.UploadUrlInfo;
 import org.bazar.bazarstorage.app.api.properties.SettingProperties;
 import org.bazar.bazarstorage.app.api.properties.SettingProperties.FileValidation.ErrorType;
+import org.bazar.bazarstorage.app.api.validator.FileValidationRequest;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeError;
 import org.bazar.bazarstorage.domain.user.User;
@@ -76,6 +77,12 @@ public abstract class StorageNodeMapper {
     public abstract UploadUrlInfo toUploadUrlInfo(InitiateUploadResult initiateUploadResult, String nodeId);
 
     public abstract StorageNodeError toStorageNodeError(FileUploadResultCommand.Error error);
+
+    @Mapping(target = "nodeName", source = "command.fileName")
+    public abstract FileValidationRequest toFileValidationRequest(GetUploadUrlCommand command, String extension);
+
+    @Mapping(target = "nodeName", source = "command.fileName")
+    public abstract FileValidationRequest toFileValidationRequest(FileUploadResultCommand command, String extension);
 
     @Named("mapErrorDescription")
     protected String mapErrorDescription(String code) {
