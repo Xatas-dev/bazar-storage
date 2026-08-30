@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.bazar"
-version = "1.0.1"
+version = "1.0.2"
 description = "bazar-storage"
 
 java {
@@ -89,6 +89,7 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.6.3")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+    implementation("org.apache.tika:tika-core:3.2.3")
 }
 
 tasks.withType<JavaCompile> {

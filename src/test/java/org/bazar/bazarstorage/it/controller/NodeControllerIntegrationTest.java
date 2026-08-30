@@ -1,6 +1,7 @@
 package org.bazar.bazarstorage.it.controller;
 
 import builder.JwtBuilder;
+import builder.StorageNodeErrorBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetDownloadUrlResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusResponse;
@@ -9,6 +10,7 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlRequest;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
 import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
+import org.bazar.bazarstorage.app.api.node.output.NodeErrorInfo;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.bazar.bazarstorage.app.api.properties.SettingProperties.FileValidation.ErrorType.FILE_TOO_LARGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -40,7 +43,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     private static final String FILE_EXTENSION_NOT_ALLOWED_MESSAGE = "Невозможно загрузить файл с расширением %s";
     private static final String FILE_NAME_TOO_LARGE_MESSAGE = "Длина имени файла не может превышать 100 символов";
     private static final TypeReference<V1GetUploadUrlResponse> TYPE_REF_V1_POST_UPLOAD_URL_RESPONSE = new TypeReference<>() {};
-    private static final TypeReference<List<String>> TYPE_REF_V1_POST_UPLOAD_URL_RESPONSE_VALIDATION_ERROR = new TypeReference<>() {};
+    private static final TypeReference<List<NodeErrorInfo>> TYPE_REF_V1_POST_UPLOAD_URL_RESPONSE_VALIDATION_ERROR = new TypeReference<>() {};
     private static final TypeReference<V1GetFileStatusResponse> TYPE_REF_V1_GET_FILE_STATUS_RESPONSE = new TypeReference<>() {};
     private static final TypeReference<V1GetNodesPaginationResponse> TYPE_REF_V1_GET_NODES_PAGINATION_RESPONSE = new TypeReference<>() {};
     private static final TypeReference<V1GetDownloadUrlResponse> TYPE_REF_V1_GET_DOWNLOAD_URL_RESPONSE = new TypeReference<>() {};
@@ -49,12 +52,12 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     void startUp() {
         wireMockTestHelper.startMockBazarPersonaServer();
         wireMockTestHelper.startMockBazarFilesServer();
+        when(bazarAuthorizationClient.authorize(any())).thenReturn(true);
     }
 
     @Test
     @DisplayName("Успешное получение presigned URL для загрузки файла")
     void getUploadUrl_success() throws Exception {
-        when(bazarAuthorizationClient.authorize(any())).thenReturn(true);
         wireMockTestHelper.stubBazarFilesInitiateUpload_200(
                 VALID_FILE_NAME, String.valueOf(VALID_SIZE), DOCX_CONTENT_TYPE, STORAGE_DOMAIN, "/NodeControllerIntegrationTest/V1InitiateUploadResponseDto.json"
         );
@@ -76,9 +79,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @Test
     @DisplayName("Ошибки валидации по получению presigned URL для загрузки файла")
     void getUploadUrl_validationError() throws Exception {
-        when(bazarAuthorizationClient.authorize(any())).thenReturn(true);
-
-        List<String> result = restTestUtil.postPerform(
+        List<NodeErrorInfo> result = restTestUtil.postPerform(
                 String.format(POST_UPLOAD_URL_API_URL, SPACE_ID),
                 Map.of(),
                 new V1GetUploadUrlRequest(INVALID_FILE_NAME, INVALID_SIZE),
@@ -87,15 +88,15 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
                 status().isBadRequest()
         );
 
-        assertTrue(result.contains(String.format(FILE_EXTENSION_NOT_ALLOWED_MESSAGE, "exe")));
-        assertTrue(result.contains(FILE_TOO_LARGE_MESSAGE));
-        assertTrue(result.contains(FILE_NAME_TOO_LARGE_MESSAGE));
+        List<String> stringResult = result.stream().map(NodeErrorInfo::description).toList();
+        assertTrue(stringResult.contains(String.format(FILE_EXTENSION_NOT_ALLOWED_MESSAGE, "exe")));
+        assertTrue(stringResult.contains(FILE_TOO_LARGE_MESSAGE));
+        assertTrue(stringResult.contains(FILE_NAME_TOO_LARGE_MESSAGE));
     }
 
     @Test
     @DisplayName("Получение статуса загруженного файла")
     void getFileStatus_success_UPLOADED() throws Exception {
-        when(bazarAuthorizationClient.authorize(any())).thenReturn(true);
         StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.UPLOADED);
         wireMockTestHelper.stubBazarPersonaGetUsers_200(
                 List.of(JwtBuilder.TEST_USER_ID), "/NodeControllerIntegrationTest/PersonaGetUsersResponse.json");
@@ -116,7 +117,6 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @Test
     @DisplayName("Получение статуса файла в процессе")
     void getFileStatus_success_IN_PROGRESS() throws Exception {
-        when(bazarAuthorizationClient.authorize(any())).thenReturn(true);
         StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.IN_PROGRESS);
 
         V1GetFileStatusResponse result = restTestUtil.getPerform(
@@ -132,9 +132,28 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     }
 
     @Test
+    @DisplayName("Получение статуса файла с ошибками")
+    void getFileStatus_success_ERROR() throws Exception {
+        StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.ERROR, List.of(
+                StorageNodeErrorBuilder.buildWith(FILE_TOO_LARGE.name()), StorageNodeErrorBuilder.buildDefault()
+        ));
+
+        V1GetFileStatusResponse result = restTestUtil.getPerform(
+                String.format(GET_STATUS_API_URL, SPACE_ID, storageNode.getId()),
+                Map.of(),
+                TYPE_REF_V1_GET_FILE_STATUS_RESPONSE,
+                Map.of(),
+                status().isOk()
+        );
+
+        assertEquals(StorageNodeStatus.ERROR.name(), result.status());
+        assertNull(result.author());
+        assertEquals(2, result.errors().size());
+    }
+
+    @Test
     @DisplayName("Получение узлов хранилища по пространству")
     void getNodes_success() throws Exception {
-        when(bazarAuthorizationClient.authorize(any())).thenReturn(true);
         wireMockTestHelper.stubBazarPersonaGetUsers_200(
                 List.of(JwtBuilder.TEST_USER_ID), "/NodeControllerIntegrationTest/PersonaGetUsersResponse.json");
         StorageNode firstNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.UPLOADED);
@@ -160,7 +179,6 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @Test
     @DisplayName("Получение presigned URL для скачивания файла")
     void getDownloadUrl_success() throws Exception {
-        when(bazarAuthorizationClient.authorize(any())).thenReturn(true);
         UUID fileUuid = UUID.randomUUID();
         StorageNode storageNode = testDataHelper.createStorageNodeWith(fileUuid);
         wireMockTestHelper.stubBazarFilesInitiateDownload_200(
@@ -181,7 +199,6 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @Test
     @DisplayName("Удаление узла из пространства")
     void deleteNode_success() throws Exception {
-        when(bazarAuthorizationClient.authorize(any())).thenReturn(true);
         StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.UPLOADED);
 
         restTestUtil.deletePerform(

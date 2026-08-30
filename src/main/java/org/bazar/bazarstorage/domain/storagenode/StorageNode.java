@@ -1,17 +1,13 @@
 package org.bazar.bazarstorage.domain.storagenode;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.bazar.bazarstorage.domain.DomainObject;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -45,4 +41,8 @@ public class StorageNode extends DomainObject {
 
     @Column(name = "user_id")
     private UUID userId;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "errors", columnDefinition = "jsonb")
+    private List<StorageNodeError> errors;
 }

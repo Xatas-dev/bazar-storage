@@ -1,0 +1,7 @@
+package org.bazar.bazarstorage.app.api.node.output;
+
+public record NodeErrorInfo(
+        String code,
+        String description
+) {
+}

@@ -19,7 +19,16 @@ public record SettingProperties(
         public enum ErrorType {
             FILE_TOO_LARGE,
             FILE_EXTENSION_NOT_ALLOWED,
-            FILE_NAME_TOO_LARGE
+            FILE_NAME_TOO_LARGE,
+            UNKNOWN_ERROR;
+
+            public static ErrorType fromString(String stringCode) {
+                try {
+                    return ErrorType.valueOf(stringCode);
+                } catch (IllegalArgumentException | NullPointerException e) {
+                    return UNKNOWN_ERROR;
+                }
+            }
         }
     }
 

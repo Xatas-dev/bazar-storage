@@ -1,0 +1,2 @@
+ALTER TABLE storage_node
+    ADD COLUMN IF NOT EXISTS errors JSONB;
