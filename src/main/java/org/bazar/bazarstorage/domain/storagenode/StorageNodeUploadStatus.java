@@ -1,6 +1,7 @@
 package org.bazar.bazarstorage.domain.storagenode;
 
 public enum StorageNodeUploadStatus {
-    ACTIVE,
-    DELETED
+    IN_PROGRESS,
+    UPLOADED,
+    ERROR
 }
