@@ -1,0 +1,4 @@
+ALTER TABLE storage_node
+    ADD COLUMN IF NOT EXISTS upload_status VARCHAR DEFAULT 'ACTIVE';
+
+ALTER TABLE storage_node ALTER COLUMN upload_status DROP DEFAULT;
