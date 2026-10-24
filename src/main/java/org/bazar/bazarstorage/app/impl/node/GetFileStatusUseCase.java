@@ -10,7 +10,7 @@ import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
 import org.bazar.bazarstorage.app.api.node.output.FileStatusInfo;
 import org.bazar.bazarstorage.app.api.persona.PersonaService;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
-import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
 import org.bazar.bazarstorage.domain.user.User;
 import org.springframework.stereotype.Component;
 
@@ -30,13 +30,13 @@ public class GetFileStatusUseCase implements GetFileStatusInbound {
         StorageNode storageNode = storageNodeRepository.findById(Long.parseLong(nodeId))
                 .orElseThrow(() -> new BusinessException(STORAGE_NODE_NOT_FOUND_BY_ID, nodeId));
 
-        if (StorageNodeStatus.UPLOADED == storageNode.getStatus()) {
+        if (StorageNodeUploadStatus.UPLOADED == storageNode.getUploadStatus()) {
             User user = personaService.getUserById(storageNode.getUserId()).orElse(null);
-            return storageNodeMapper.toFileStatusInfo(storageNode.getStatus().name(), user, AuthorStatus.from(user));
-        } else if (StorageNodeStatus.ERROR == storageNode.getStatus()) {
+            return storageNodeMapper.toFileStatusInfo(storageNode.getUploadStatus().name(), user, AuthorStatus.from(user));
+        } else if (StorageNodeUploadStatus.ERROR == storageNode.getUploadStatus()) {
             return storageNodeMapper.toFileStatusInfo(storageNode);
         }
 
-        return storageNodeMapper.toFileStatusInfo(storageNode.getStatus().name());
+        return storageNodeMapper.toFileStatusInfo(storageNode.getUploadStatus().name());
     }
 }

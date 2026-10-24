@@ -4,5 +4,6 @@ public enum StorageNodeStatus {
     IN_PROGRESS,
     UPLOADED,
     ERROR,
+    ACTIVE,
     DELETED
 }

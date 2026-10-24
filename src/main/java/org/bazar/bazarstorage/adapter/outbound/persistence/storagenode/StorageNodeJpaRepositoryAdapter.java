@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.bazar.bazarstorage.app.api.node.StorageNodeRepository;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeType;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -29,8 +31,10 @@ public class StorageNodeJpaRepositoryAdapter implements StorageNodeRepository {
     }
 
     @Override
-    public Page<StorageNode> findBySpaceIdAndStatus(Long spaceId, StorageNodeStatus status, Pageable pageable) {
-        return storageNodeJpaRepository.findBySpaceIdAndStatus(spaceId, status, pageable);
+    public Page<StorageNode> findActiveNodes(Long spaceId, Pageable pageable) {
+        return storageNodeJpaRepository.findBySpaceIdAndStatusAndUploadedStatusOrType(
+                spaceId, StorageNodeStatus.ACTIVE, StorageNodeUploadStatus.UPLOADED, StorageNodeType.FOLDER, pageable
+        );
     }
 
     @Override
