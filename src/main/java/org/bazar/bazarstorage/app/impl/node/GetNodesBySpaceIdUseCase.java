@@ -1,6 +1,7 @@
 package org.bazar.bazarstorage.app.impl.node;
 
 import lombok.RequiredArgsConstructor;
+import org.bazar.bazarstorage.app.api.auth.Authorize;
 import org.bazar.bazarstorage.app.api.node.GetNodesBySpaceIdInbound;
 import org.bazar.bazarstorage.app.api.node.StorageNodeMapper;
 import org.bazar.bazarstorage.app.api.node.StorageNodeRepository;
@@ -8,10 +9,8 @@ import org.bazar.bazarstorage.app.api.node.commands.GetNodesBySpaceIdCommand;
 import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
 import org.bazar.bazarstorage.app.api.node.output.NodeInfo;
 import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
-import org.bazar.bazarstorage.app.api.auth.Authorize;
 import org.bazar.bazarstorage.app.impl.service.UserLoader;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
-import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.bazar.bazarstorage.domain.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,7 +36,7 @@ public class GetNodesBySpaceIdUseCase implements GetNodesBySpaceIdInbound {
     @Authorize(spaceIdParam = "#command.spaceId", permission = STORAGE_NODE_READ)
     public NodeInfoPage execute(GetNodesBySpaceIdCommand command) {
         Page<StorageNode> storageNodes =
-                storageNodeRepository.findBySpaceIdAndStatus(command.spaceId(), StorageNodeStatus.UPLOADED, normalize(command.pageable()));
+                storageNodeRepository.findActiveNodes(command.spaceId(), normalize(command.pageable()));
         Map<UUID, User> usersMap = userLoader.loadUsers(storageNodes.getContent());
         Page<NodeInfo> dtoPage = storageNodes.map(storageNode -> {
                     User user = usersMap.get(storageNode.getUserId());

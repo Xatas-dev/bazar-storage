@@ -1,7 +1,6 @@
 package org.bazar.bazarstorage.app.api.node;
 
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
-import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,7 +13,7 @@ public interface StorageNodeRepository {
 
     Optional<StorageNode> findByFileUuid(String fileUuid);
 
-    Page<StorageNode> findBySpaceIdAndStatus(Long spaceId, StorageNodeStatus status, Pageable pageable);
+    Page<StorageNode> findActiveNodes(Long spaceId, Pageable pageable);
 
     Optional<StorageNode> findById(Long nodeId);
 

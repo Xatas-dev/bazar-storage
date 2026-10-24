@@ -11,7 +11,7 @@ import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.bazar.authorization.sdk.Permission.*;
+import static org.bazar.authorization.sdk.Permission.STORAGE_NODE_DELETE;
 
 @Component
 @RequiredArgsConstructor

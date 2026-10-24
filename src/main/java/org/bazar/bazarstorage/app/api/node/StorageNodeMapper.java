@@ -31,7 +31,8 @@ public abstract class StorageNodeMapper {
     protected SettingProperties settingProperties;
 
     @Mapping(target = "nodeName", source = "command.fileName")
-    @Mapping(target = "status", expression = "java(org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus.IN_PROGRESS)")
+    @Mapping(target = "uploadStatus", expression = "java(org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus.IN_PROGRESS)")
+    @Mapping(target = "status", expression = "java(org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus.ACTIVE)")
     @Mapping(target = "type", expression = "java(org.bazar.bazarstorage.domain.storagenode.StorageNodeType.FILE)")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -67,6 +68,7 @@ public abstract class StorageNodeMapper {
     public abstract FileStatusInfo toFileStatusInfo(String status);
 
     @Mapping(target = "author", ignore = true)
+    @Mapping(target = "status", source = "uploadStatus")
     public abstract FileStatusInfo toFileStatusInfo(StorageNode storageNode);
 
     @Mapping(target = "description", source = "storageNodeError.code", qualifiedByName = "mapErrorDescription")
