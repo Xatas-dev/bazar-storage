@@ -3,6 +3,7 @@ package org.bazar.bazarstorage.it.schedule;
 import org.bazar.bazarstorage.adapter.inbound.schedule.NodesDeletingScheduler;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
 import org.bazar.bazarstorage.it.AbstractIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,9 +61,9 @@ public class NodesDeletingSchedulerIntegrationTest extends AbstractIntegrationTe
         UUID deletedUuid2 = UUID.randomUUID();
         testDataHelper.createStorageNodeWith(deletedUuid2, StorageNodeStatus.DELETED);
         UUID uploadedUuid = UUID.randomUUID();
-        testDataHelper.createStorageNodeWith(uploadedUuid, StorageNodeStatus.UPLOADED);
+        testDataHelper.createStorageNodeWith(uploadedUuid, StorageNodeUploadStatus.UPLOADED);
         UUID inProgressUuid = UUID.randomUUID();
-        testDataHelper.createStorageNodeWith(inProgressUuid, StorageNodeStatus.IN_PROGRESS);
+        testDataHelper.createStorageNodeWith(inProgressUuid, StorageNodeUploadStatus.IN_PROGRESS);
 
         Integer status = deleteSuccess ? 200 : 400;
         wireMockTestHelper.stubBazarFilesDeleteFileByFileUuid(deletedUuid1.toString(), status);

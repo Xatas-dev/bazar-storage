@@ -51,4 +51,11 @@ public class StorageNodeBuilder {
         storageNode.setStatus(status);
         return storageNode;
     }
+
+    public StorageNode buildWith(UUID fileUuid, StorageNodeUploadStatus status) {
+        StorageNode storageNode = buildDefault();
+        storageNode.setFileUuid(fileUuid);
+        storageNode.setUploadStatus(status);
+        return storageNode;
+    }
 }

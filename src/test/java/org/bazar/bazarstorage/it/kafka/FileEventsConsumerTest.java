@@ -6,7 +6,6 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.producer.Producer;
 import org.bazar.bazarstorage.app.api.node.commands.FileUploadStatus;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
-import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +44,7 @@ public class FileEventsConsumerTest extends AbstractKafkaIntegrationTest {
     @DisplayName("Обработка успешного статуса файла")
     void handle_successFile() throws JsonProcessingException {
         StorageNode storageNode = testDataHelper.createStorageNodeWith(
-                UUID.fromString(FileUploadResultCommandBuilder.DEFAULT_FILE_UUID), StorageNodeStatus.IN_PROGRESS);
+                UUID.fromString(FileUploadResultCommandBuilder.DEFAULT_FILE_UUID), StorageNodeUploadStatus.IN_PROGRESS);
 
         sendMessage(kafkaConsumer, kafkaProducer, FILE_EVENTS_TOPIC, "", FileUploadResultCommandBuilder.buildDefault());
 
@@ -66,7 +65,7 @@ public class FileEventsConsumerTest extends AbstractKafkaIntegrationTest {
     @DisplayName("Обработка файла с ошибочным статусом")
     void handle_errorFile() throws JsonProcessingException {
         StorageNode storageNode = testDataHelper.createStorageNodeWith(
-                UUID.fromString(FileUploadResultCommandBuilder.DEFAULT_FILE_UUID), StorageNodeStatus.IN_PROGRESS);
+                UUID.fromString(FileUploadResultCommandBuilder.DEFAULT_FILE_UUID), StorageNodeUploadStatus.IN_PROGRESS);
 
         sendMessage(kafkaConsumer, kafkaProducer, FILE_EVENTS_TOPIC, "",
                 FileUploadResultCommandBuilder.buildWith(FileUploadStatus.ERROR));
@@ -88,7 +87,7 @@ public class FileEventsConsumerTest extends AbstractKafkaIntegrationTest {
     @DisplayName("Обработка файла с валидационными ошибками")
     void handle_validationErrorsFile() throws JsonProcessingException {
         StorageNode storageNode = testDataHelper.createStorageNodeWith(
-                UUID.fromString(FileUploadResultCommandBuilder.DEFAULT_FILE_UUID), StorageNodeStatus.IN_PROGRESS);
+                UUID.fromString(FileUploadResultCommandBuilder.DEFAULT_FILE_UUID), StorageNodeUploadStatus.IN_PROGRESS);
 
         sendMessage(kafkaConsumer, kafkaProducer, FILE_EVENTS_TOPIC, "",
                 FileUploadResultCommandBuilder.buildValidationErrorMessage(List.of("FILE_TOO_LARGE", "FILE_NAME_TOO_LARGE", "random_thing")));
@@ -109,7 +108,7 @@ public class FileEventsConsumerTest extends AbstractKafkaIntegrationTest {
     @DisplayName("Обработка файла с валидационными ошибками на стороне bazar-storage")
     void handle_bazarStorageValidationErrors() throws JsonProcessingException {
         StorageNode storageNode = testDataHelper.createStorageNodeWith(
-                UUID.fromString(FileUploadResultCommandBuilder.DEFAULT_FILE_UUID), StorageNodeStatus.IN_PROGRESS);
+                UUID.fromString(FileUploadResultCommandBuilder.DEFAULT_FILE_UUID), StorageNodeUploadStatus.IN_PROGRESS);
 
         sendMessage(kafkaConsumer, kafkaProducer, FILE_EVENTS_TOPIC, "",
                 FileUploadResultCommandBuilder.buildWith(BIG_SIZE, LONG_FILE_NAME, INVALID_CONTENT_TYPE));
