@@ -52,4 +52,9 @@ public class StorageNodeJpaRepositoryAdapter implements StorageNodeRepository {
     public void deleteAllByIds(List<Long> ids) {
         storageNodeJpaRepository.deleteAllByIdInBatch(ids);
     }
+
+    @Override
+    public int updateFileUuid(Long nodeId, UUID fileUuid) {
+        return storageNodeJpaRepository.updateFileUuid(nodeId, fileUuid);
+    }
 }

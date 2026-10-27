@@ -13,13 +13,16 @@ public record SettingProperties(
     public record FileValidation(
         Long maxFileSize,
         List<String> notAllowedExtensions,
-        Integer maxFileNameLength,
+        Integer maxNodeNameLength,
         Map<ErrorType, String> errorMessages
     ) {
         public enum ErrorType {
             FILE_TOO_LARGE,
             FILE_EXTENSION_NOT_ALLOWED,
-            FILE_NAME_TOO_LARGE,
+            NODE_NAME_TOO_LONG,
+            PARENT_NODE_WRONG_TYPE,
+            PARENT_NODE_WRONG_SPACE,
+            PARENT_NODE_WRONG_STATUS,
             UNKNOWN_ERROR;
 
             public static ErrorType fromString(String stringCode) {

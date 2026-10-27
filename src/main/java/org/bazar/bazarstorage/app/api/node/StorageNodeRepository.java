@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface StorageNodeRepository {
     void save(StorageNode storageNode);
@@ -20,4 +21,6 @@ public interface StorageNodeRepository {
     List<StorageNode> findDeletedNodesAfterIdWithRetention(Long lastId, Instant retentionThreshold, Integer batchSize);
 
     void deleteAllByIds(List<Long> ids);
+
+    int updateFileUuid(Long nodeId, UUID fileUuid);
 }

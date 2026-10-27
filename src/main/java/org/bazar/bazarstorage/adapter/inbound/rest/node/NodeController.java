@@ -1,21 +1,25 @@
 package org.bazar.bazarstorage.adapter.inbound.rest.node;
 
 import lombok.RequiredArgsConstructor;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeRequest;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetDownloadUrlResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
-import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlRequest;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
+import org.bazar.bazarstorage.app.api.node.GetUploadUrlInbound;
 import org.bazar.bazarstorage.app.api.node.MarkNodeForDeletionInbound;
 import org.bazar.bazarstorage.app.api.node.GetDownloadUrlInbound;
 import org.bazar.bazarstorage.app.api.node.GetFileStatusInbound;
 import org.bazar.bazarstorage.app.api.node.GetNodesBySpaceIdInbound;
-import org.bazar.bazarstorage.app.api.node.GetUploadUrlInbound;
+import org.bazar.bazarstorage.app.api.node.CreateNodeInbound;
 import org.bazar.bazarstorage.app.api.node.commands.GetNodesBySpaceIdCommand;
+import org.bazar.bazarstorage.app.api.node.commands.CreateNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
 import org.bazar.bazarstorage.app.api.node.output.DownloadUrlInfo;
 import org.bazar.bazarstorage.app.api.node.output.FileStatusInfo;
 import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
+import org.bazar.bazarstorage.app.api.node.output.CreatedNodeInfo;
 import org.bazar.bazarstorage.app.api.node.output.UploadUrlInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -32,17 +36,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NodeController implements NodeControllerSwagger {
     private final RestNodeMapper restNodeMapper;
-    private final GetUploadUrlInbound getUploadUrlInbound;
+    private final CreateNodeInbound createNodeInbound;
     private final GetFileStatusInbound getFileStatusInbound;
     private final GetNodesBySpaceIdInbound getNodesBySpaceIdInbound;
     private final GetDownloadUrlInbound getDownloadUrlInbound;
     private final MarkNodeForDeletionInbound markNodeForDeletionInbound;
+    private final GetUploadUrlInbound getUploadUrlInbound;
 
     @PostMapping
-    public V1GetUploadUrlResponse getUploadUrl(@RequestBody V1GetUploadUrlRequest request, @PathVariable String spaceId) {
-        GetUploadUrlCommand command = restNodeMapper.toCommand(request, spaceId);
-        UploadUrlInfo urlInfo = getUploadUrlInbound.execute(command);
+    public V1CreateNodeResponse createNode(@RequestBody V1CreateNodeRequest request, @PathVariable String spaceId) {
+        CreateNodeCommand command = restNodeMapper.toCommand(request, spaceId);
+        CreatedNodeInfo urlInfo = createNodeInbound.execute(command);
         return restNodeMapper.toResponse(urlInfo);
+    }
+
+    @GetMapping("/{nodeId}/upload")
+    public V1GetUploadUrlResponse getNodeUploadUrl(@PathVariable String spaceId, @PathVariable String nodeId) {
+        GetUploadUrlCommand command = restNodeMapper.toCommand(spaceId, nodeId);
+        UploadUrlInfo uploadUrlInfo = getUploadUrlInbound.execute(command);
+        return restNodeMapper.toResponse(uploadUrlInfo);
     }
 
     @GetMapping("/{nodeId}/status")
