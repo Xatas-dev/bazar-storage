@@ -4,20 +4,27 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeRequest;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetDownloadUrlResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
-import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlRequest;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 
 public interface NodeControllerSwagger {
-    @Operation(summary = "Получить URL для загрузки файла", description = "Возвращает URL для загрузки файла в хранилище и UUID файла")
+    @Operation(summary = "Создать узел в пространстве", description = "Возвращает информацию о созданном узле")
+    @ApiResponse(responseCode = "200", description = "Успешный ответ",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = V1CreateNodeResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Некорректный запрос")
+    V1CreateNodeResponse createNode(V1CreateNodeRequest request, String spaceId);
+
+    @Operation(summary = "Получение URL для загрузки файла в S3", description = "Возвращает подписанную ссылку на загрузку файла в S3")
     @ApiResponse(responseCode = "200", description = "Успешный ответ",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = V1GetUploadUrlResponse.class)))
     @ApiResponse(responseCode = "400", description = "Некорректный запрос")
-    V1GetUploadUrlResponse getUploadUrl(V1GetUploadUrlRequest request, String spaceId);
+    V1GetUploadUrlResponse getNodeUploadUrl(String spaceId, String nodeId);
 
     @Operation(summary = "Получить статус загрузки файла", description = "Возвращает статус загрузки файла по его UUID")
     @ApiResponse(responseCode = "200", description = "Успешный ответ",

@@ -1,7 +1,8 @@
 package org.bazar.bazarstorage.app.api.node;
 
+import org.bazar.bazarstorage.app.api.files.command.InitiateUploadCommand;
+import org.bazar.bazarstorage.app.api.node.commands.CreateNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.FileUploadResultCommand;
-import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
 import org.bazar.bazarstorage.app.api.node.output.AuthorInfo;
 import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
 import org.bazar.bazarstorage.app.api.node.output.DownloadUrlInfo;
@@ -13,9 +14,10 @@ import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
 import org.bazar.bazarstorage.app.api.node.output.UploadUrlInfo;
 import org.bazar.bazarstorage.app.api.properties.SettingProperties;
 import org.bazar.bazarstorage.app.api.properties.SettingProperties.FileValidation.ErrorType;
-import org.bazar.bazarstorage.app.api.validator.FileValidationRequest;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeError;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeType;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
 import org.bazar.bazarstorage.domain.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,16 +32,19 @@ public abstract class StorageNodeMapper {
     @Autowired
     protected SettingProperties settingProperties;
 
-    @Mapping(target = "nodeName", source = "command.fileName")
-    @Mapping(target = "uploadStatus", expression = "java(org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus.IN_PROGRESS)")
+    @Mapping(target = "nodeName", source = "command.name")
+    @Mapping(target = "uploadStatus", source = "command", qualifiedByName = "mapUploadStatus")
     @Mapping(target = "status", expression = "java(org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus.ACTIVE)")
-    @Mapping(target = "type", expression = "java(org.bazar.bazarstorage.domain.storagenode.StorageNodeType.FILE)")
+    @Mapping(target = "type", source = "command.type")
+    @Mapping(target = "spaceId", source = "command.spaceId")
+    @Mapping(target = "size", source = "command.size")
+    @Mapping(target = "parent", source = "parent")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "parent", ignore = true)
     @Mapping(target = "errors", ignore = true)
-    public abstract StorageNode toDomain(GetUploadUrlCommand command, InitiateUploadResult uploadUrlInfo, UUID userId);
+    @Mapping(target = "fileUuid", ignore = true)
+    public abstract StorageNode toDomain(CreateNodeCommand command, StorageNode parent, UUID userId);
 
     @Mapping(target = "fileName", source = "storageNode.nodeName")
     @Mapping(target = "uploadedAt", source = "storageNode.createdAt")
@@ -76,18 +81,23 @@ public abstract class StorageNodeMapper {
 
     public abstract DownloadUrlInfo toDownloadUrlInfo(String downloadUrl);
 
-    public abstract UploadUrlInfo toUploadUrlInfo(InitiateUploadResult initiateUploadResult, String nodeId);
-
     public abstract StorageNodeError toStorageNodeError(FileUploadResultCommand.Error error);
 
-    @Mapping(target = "nodeName", source = "command.fileName")
-    public abstract FileValidationRequest toFileValidationRequest(GetUploadUrlCommand command, String extension);
+    @Mapping(target = "fileName", source = "nodeName")
+    public abstract InitiateUploadCommand toInitiateUploadCommand(StorageNode storageNode);
 
-    @Mapping(target = "nodeName", source = "command.fileName")
-    public abstract FileValidationRequest toFileValidationRequest(FileUploadResultCommand command, String extension);
+    public abstract UploadUrlInfo toUploadUrlInfo(InitiateUploadResult initiateUploadResult);
 
     @Named("mapErrorDescription")
     protected String mapErrorDescription(String code) {
         return settingProperties.fileValidation().errorMessages().get(ErrorType.fromString(code));
+    }
+
+    @Named("mapUploadStatus")
+    protected StorageNodeUploadStatus mapUploadStatus(CreateNodeCommand command) {
+        if (StorageNodeType.FILE == command.type()) {
+            return StorageNodeUploadStatus.IN_PROGRESS;
+        }
+        return null;
     }
 }

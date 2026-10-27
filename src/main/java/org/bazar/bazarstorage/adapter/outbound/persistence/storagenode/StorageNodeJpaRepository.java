@@ -7,7 +7,9 @@ import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
@@ -35,4 +37,12 @@ public interface StorageNodeJpaRepository extends JpaRepository<StorageNode, Lon
     """, nativeQuery = true)
     List<StorageNode> findNodesByStatusAfterIdWithRetentionAndLimit(
             Long lastId, String status, Instant retentionThreshold, Integer batch);
+
+    @Modifying
+    @Query("""
+    UPDATE StorageNode sn
+    SET sn.fileUuid = :fileUuid
+    WHERE sn.id = :nodeId
+    """)
+    int updateFileUuid(@Param("nodeId") Long nodeId, @Param("fileUuid") UUID fileUuid);
 }

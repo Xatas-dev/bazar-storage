@@ -8,9 +8,8 @@ import org.bazar.bazarstorage.app.api.node.StorageNodeMapper;
 import org.bazar.bazarstorage.app.api.node.StorageNodeRepository;
 import org.bazar.bazarstorage.app.api.node.commands.FileUploadResultCommand;
 import org.bazar.bazarstorage.app.api.node.commands.FileUploadStatus;
-import org.bazar.bazarstorage.app.api.validator.StorageNodeValidator;
-import org.bazar.bazarstorage.app.impl.helper.FilesHelper;
 import org.bazar.bazarstorage.app.impl.helper.StorageNodeStatusChanger;
+import org.bazar.bazarstorage.app.impl.validator.UploadedFileValidator;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeError;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
@@ -36,7 +35,7 @@ public class ProcessFileUploadedResultUseCase implements ProcessFileUploadedResu
     private final StorageNodeRepository storageNodeRepository;
     private final StorageNodeStatusChanger statusChanger;
     private final StorageNodeMapper storageNodeMapper;
-    private final StorageNodeValidator storageNodeValidator;
+    private final UploadedFileValidator uploadedFileValidator;
 
     @Override
     @Transactional
@@ -72,8 +71,7 @@ public class ProcessFileUploadedResultUseCase implements ProcessFileUploadedResu
         if (FileUploadStatus.VALIDATION_ERROR.equals(command.status())) {
             return generateNodeErrors(command);
         }
-        return storageNodeValidator.validate(storageNodeMapper.toFileValidationRequest(command,
-                FilesHelper.getExtensionFromContentType(command.contentType())));
+        return uploadedFileValidator.validate(command);
     }
 
     private List<StorageNodeError> generateNodeErrors(FileUploadResultCommand command) {

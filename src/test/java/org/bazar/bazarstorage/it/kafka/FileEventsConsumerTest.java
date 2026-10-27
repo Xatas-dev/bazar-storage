@@ -120,7 +120,7 @@ public class FileEventsConsumerTest extends AbstractKafkaIntegrationTest {
                         .map(StorageNode::getUploadStatus)
                         .orElse(null) == StorageNodeUploadStatus.ERROR);
         StorageNode result = storageNodeJpaRepository.findByFileUuid(storageNode.getFileUuid()).orElseThrow();
-        assertEquals(3, result.getErrors().size());
+        assertEquals(2, result.getErrors().size());
         assertEquals(BIG_SIZE, result.getSize());
         assertEquals(LONG_FILE_NAME, result.getNodeName());
     }
