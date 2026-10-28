@@ -57,4 +57,9 @@ public class StorageNodeJpaRepositoryAdapter implements StorageNodeRepository {
     public int updateFileUuid(Long nodeId, UUID fileUuid) {
         return storageNodeJpaRepository.updateFileUuid(nodeId, fileUuid);
     }
+
+    @Override
+    public List<StorageNode> findAllDescendants(Long nodeId) {
+        return storageNodeJpaRepository.findAllWithRecursive(nodeId);
+    }
 }

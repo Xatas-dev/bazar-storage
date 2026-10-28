@@ -6,6 +6,7 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusRespo
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
+import org.bazar.bazarstorage.app.api.node.commands.DeleteNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetNodesBySpaceIdCommand;
 import org.bazar.bazarstorage.app.api.node.commands.CreateNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
@@ -24,6 +25,8 @@ public interface RestNodeMapper {
     GetUploadUrlCommand toCommand(String spaceId, String nodeId);
 
     GetNodesBySpaceIdCommand toCommand(String spaceId, Pageable pageable);
+
+    DeleteNodeCommand toDeleteCommand(String spaceId, String nodeId);
 
     V1CreateNodeResponse toResponse(CreatedNodeInfo createdNodeInfo);
 

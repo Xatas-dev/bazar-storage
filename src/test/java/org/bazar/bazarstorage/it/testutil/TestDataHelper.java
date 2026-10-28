@@ -40,6 +40,14 @@ public class TestDataHelper {
         return storageNodeJpaRepository.save(storageNode);
     }
 
+    public StorageNode createStorageNodeWith(StorageNodeStatus status, StorageNodeType type, Long spaceId, StorageNode parent) {
+        StorageNode storageNode = StorageNodeBuilder.buildWith(status);
+        storageNode.setType(type);
+        storageNode.setSpaceId(spaceId);
+        storageNode.setParent(parent);
+        return storageNodeJpaRepository.save(storageNode);
+    }
+
     public StorageNode createStorageNodeWith(StorageNodeStatus status) {
         return storageNodeJpaRepository.save(StorageNodeBuilder.buildWith(status));
     }
@@ -54,8 +62,10 @@ public class TestDataHelper {
         return storageNodeJpaRepository.save(StorageNodeBuilder.buildWith(fileUuid));
     }
 
-    public StorageNode createStorageNodeWith(UUID fileUuid, StorageNodeStatus status) {
-        return storageNodeJpaRepository.save(StorageNodeBuilder.buildWith(fileUuid, status));
+    public StorageNode createStorageNodeWith(UUID fileUuid, StorageNodeStatus status, StorageNodeType type) {
+        StorageNode storageNode = StorageNodeBuilder.buildWith(fileUuid, status);
+        storageNode.setType(type);
+        return storageNodeJpaRepository.save(storageNode);
     }
 
     public StorageNode createStorageNodeWith(UUID fileUuid, StorageNodeUploadStatus status) {
