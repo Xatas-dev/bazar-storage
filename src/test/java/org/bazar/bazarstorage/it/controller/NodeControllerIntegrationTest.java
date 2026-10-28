@@ -4,11 +4,11 @@ import builder.JwtBuilder;
 import builder.StorageNodeErrorBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeRequest;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetDownloadUrlResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesResponse;
-import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
 import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
 import org.bazar.bazarstorage.app.api.node.output.NodeErrorInfo;
@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.bazar.bazarstorage.app.api.properties.SettingProperties.FileValidation.ErrorType.FILE_TOO_LARGE;
+import static org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus.DELETED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -117,7 +118,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @Test
     @DisplayName("Ошибки валидации по созданию узла типа Файл")
     void createNode_file_validationError() throws Exception {
-        StorageNode wrongParent = testDataHelper.createStorageNodeWith(StorageNodeStatus.DELETED, StorageNodeType.FILE, 5L);
+        StorageNode wrongParent = testDataHelper.createStorageNodeWith(DELETED, StorageNodeType.FILE, 5L);
 
         List<NodeErrorInfo> result = restTestUtil.postPerform(
                 String.format(POST_CREATE_NODE_API_URL, SPACE_ID),
@@ -302,8 +303,8 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     }
 
     @Test
-    @DisplayName("Удаление узла из пространства")
-    void deleteNode_success() throws Exception {
+    @DisplayName("Удаление файла из пространства")
+    void deleteNode_file_success() throws Exception {
         StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeUploadStatus.UPLOADED);
 
         restTestUtil.deletePerform(
@@ -317,7 +318,31 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
 
         StorageNode deletedNode = storageNodeJpaRepository.findById(storageNode.getId()).orElse(null);
         assertNotNull(deletedNode);
-        assertEquals(StorageNodeStatus.DELETED, deletedNode.getStatus());
+        assertEquals(DELETED, deletedNode.getStatus());
+    }
+
+    @Test
+    @DisplayName("Удаление папки с вложенными папками и файлами из пространства")
+    void deleteNode_folder_success() throws Exception {
+        StorageNode storageNodeToDelete =
+                testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE, StorageNodeType.FOLDER, Long.parseLong(SPACE_ID));
+        StorageNode folderStorageNode =
+                testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE, StorageNodeType.FOLDER, Long.parseLong(SPACE_ID), storageNodeToDelete);
+        testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE, StorageNodeType.FOLDER, Long.parseLong(SPACE_ID), storageNodeToDelete);
+        testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE, StorageNodeType.FILE, Long.parseLong(SPACE_ID), storageNodeToDelete);
+        testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE, StorageNodeType.FILE, Long.parseLong(SPACE_ID), folderStorageNode);
+
+        restTestUtil.deletePerform(
+                String.format(DELETE_NODE_API_URL, SPACE_ID, storageNodeToDelete.getId()),
+                Map.of(),
+                null,
+                new TypeReference<Void>() {},
+                Map.of(),
+                status().isOk()
+        );
+
+        List<StorageNode> deletedStorageNodes = storageNodeJpaRepository.findAllWithRecursive(storageNodeToDelete.getId());
+        deletedStorageNodes.forEach(storageNode -> assertEquals(DELETED, storageNode.getStatus()));
     }
 
     @Test

@@ -13,6 +13,7 @@ import org.bazar.bazarstorage.app.api.node.GetDownloadUrlInbound;
 import org.bazar.bazarstorage.app.api.node.GetFileStatusInbound;
 import org.bazar.bazarstorage.app.api.node.GetNodesBySpaceIdInbound;
 import org.bazar.bazarstorage.app.api.node.CreateNodeInbound;
+import org.bazar.bazarstorage.app.api.node.commands.DeleteNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetNodesBySpaceIdCommand;
 import org.bazar.bazarstorage.app.api.node.commands.CreateNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
@@ -78,6 +79,7 @@ public class NodeController implements NodeControllerSwagger {
 
     @DeleteMapping("/{nodeId}")
     public void deleteNode(@PathVariable String spaceId, @PathVariable String nodeId) {
-        markNodeForDeletionInbound.execute(spaceId, nodeId);
+        DeleteNodeCommand command = restNodeMapper.toDeleteCommand(spaceId, nodeId);
+        markNodeForDeletionInbound.execute(command);
     }
 }

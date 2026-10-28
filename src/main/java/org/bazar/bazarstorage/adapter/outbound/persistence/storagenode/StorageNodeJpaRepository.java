@@ -45,4 +45,22 @@ public interface StorageNodeJpaRepository extends JpaRepository<StorageNode, Lon
     WHERE sn.id = :nodeId
     """)
     int updateFileUuid(@Param("nodeId") Long nodeId, @Param("fileUuid") UUID fileUuid);
+
+    @Query(value = """
+    WITH RECURSIVE node_tree AS (
+        SELECT id
+        FROM storage_node
+        WHERE id = :nodeId
+
+        UNION ALL
+
+        SELECT child.id
+        FROM storage_node child
+        JOIN node_tree parent ON child.parent_id = parent.id
+    )
+    SELECT sn.*
+    FROM storage_node sn
+    JOIN node_tree nt ON nt.id = sn.id
+    """, nativeQuery = true)
+    List<StorageNode> findAllWithRecursive(@Param("nodeId") Long nodeId);
 }

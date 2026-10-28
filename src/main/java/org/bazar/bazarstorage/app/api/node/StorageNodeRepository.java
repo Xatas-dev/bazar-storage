@@ -23,4 +23,6 @@ public interface StorageNodeRepository {
     void deleteAllByIds(List<Long> ids);
 
     int updateFileUuid(Long nodeId, UUID fileUuid);
+
+    List<StorageNode> findAllDescendants(Long nodeId);
 }

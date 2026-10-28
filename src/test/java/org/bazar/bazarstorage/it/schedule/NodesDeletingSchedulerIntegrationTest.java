@@ -3,9 +3,11 @@ package org.bazar.bazarstorage.it.schedule;
 import org.bazar.bazarstorage.adapter.inbound.schedule.NodesDeletingScheduler;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeType;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
 import org.bazar.bazarstorage.it.AbstractIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -24,6 +26,7 @@ public class NodesDeletingSchedulerIntegrationTest extends AbstractIntegrationTe
     }
 
     @Test
+    @DisplayName("Успешное удаление помеченных узлов")
     void deleteMarkedNodes_success() {
         generateStubFiles(true);
 
@@ -38,17 +41,18 @@ public class NodesDeletingSchedulerIntegrationTest extends AbstractIntegrationTe
     }
 
     @Test
+    @DisplayName("Неуспешное удаление помеченных узлов - ошибка от bazar-files")
     void deleteMarkedNodes_failedFromFiles() {
         generateStubFiles(false);
 
         nodesDeletingScheduler.deleteMarkedNodes();
 
         List<StorageNode> resultAfterScheduler = storageNodeJpaRepository.findAll();
-        assertEquals(4, resultAfterScheduler.size());
+        assertEquals(3, resultAfterScheduler.size());
         List<StorageNode> nodesMarkedDeleted = resultAfterScheduler.stream()
                 .filter(node -> node.getStatus() == StorageNodeStatus.DELETED)
                 .toList();
-        assertEquals(2, nodesMarkedDeleted.size());
+        assertEquals(1, nodesMarkedDeleted.size());
     }
 
     // =================================================================================================================
@@ -57,9 +61,8 @@ public class NodesDeletingSchedulerIntegrationTest extends AbstractIntegrationTe
 
     private void generateStubFiles(boolean deleteSuccess) {
         UUID deletedUuid1 = UUID.randomUUID();
-        testDataHelper.createStorageNodeWith(deletedUuid1, StorageNodeStatus.DELETED);
-        UUID deletedUuid2 = UUID.randomUUID();
-        testDataHelper.createStorageNodeWith(deletedUuid2, StorageNodeStatus.DELETED);
+        testDataHelper.createStorageNodeWith(deletedUuid1, StorageNodeStatus.DELETED, StorageNodeType.FILE);
+        testDataHelper.createStorageNodeWith(null, StorageNodeStatus.DELETED, StorageNodeType.FOLDER);
         UUID uploadedUuid = UUID.randomUUID();
         testDataHelper.createStorageNodeWith(uploadedUuid, StorageNodeUploadStatus.UPLOADED);
         UUID inProgressUuid = UUID.randomUUID();
@@ -67,7 +70,6 @@ public class NodesDeletingSchedulerIntegrationTest extends AbstractIntegrationTe
 
         Integer status = deleteSuccess ? 200 : 400;
         wireMockTestHelper.stubBazarFilesDeleteFileByFileUuid(deletedUuid1.toString(), status);
-        wireMockTestHelper.stubBazarFilesDeleteFileByFileUuid(deletedUuid2.toString(), status);
         wireMockTestHelper.stubBazarFilesDeleteFileByFileUuid(uploadedUuid.toString(), status);
         wireMockTestHelper.stubBazarFilesDeleteFileByFileUuid(inProgressUuid.toString(), status);
     }
