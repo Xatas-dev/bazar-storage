@@ -3,6 +3,7 @@ package builder;
 import lombok.experimental.UtilityClass;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeType;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
 
 import java.util.UUID;
@@ -12,6 +13,7 @@ public class StorageNodeBuilder {
     public static final String DEFAULT_NODE_NAME = "name.pdf";
     public static final StorageNodeStatus DEFAULT_STATUS = StorageNodeStatus.ACTIVE;
     public static final StorageNodeUploadStatus DEFAULT_UPLOAD_STATUS = StorageNodeUploadStatus.UPLOADED;
+    public static final StorageNodeType DEFAULT_TYPE = StorageNodeType.FILE;
     public static final Long DEFAULT_SIZE = 1000L;
     public static final Long DEFAULT_SPACE_ID = 1L;
 
@@ -24,6 +26,7 @@ public class StorageNodeBuilder {
         storageNode.setSpaceId(DEFAULT_SPACE_ID);
         storageNode.setUserId(JwtBuilder.TEST_USER_ID);
         storageNode.setUploadStatus(DEFAULT_UPLOAD_STATUS);
+        storageNode.setType(DEFAULT_TYPE);
         return storageNode;
     }
 
