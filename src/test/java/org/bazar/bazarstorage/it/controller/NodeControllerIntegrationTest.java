@@ -186,7 +186,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     }
 
     @Test
-    @DisplayName("Получение статуса загруженного файла")
+    @DisplayName("Получение статуса загрузки узла")
     void getFileStatus_success_UPLOADED() throws Exception {
         StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeUploadStatus.UPLOADED);
         wireMockTestHelper.stubBazarPersonaGetUsers_200(
@@ -206,7 +206,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     }
 
     @Test
-    @DisplayName("Получение статуса файла в процессе")
+    @DisplayName("Получение статуса загрузки узла в процессе")
     void getFileStatus_success_IN_PROGRESS() throws Exception {
         StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeUploadStatus.IN_PROGRESS);
 
@@ -223,7 +223,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     }
 
     @Test
-    @DisplayName("Получение статуса файла с ошибками")
+    @DisplayName("Получение статуса загрузки узла с ошибками")
     void getFileStatus_success_ERROR() throws Exception {
         StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeUploadStatus.ERROR, List.of(
                 StorageNodeErrorBuilder.buildWith(FILE_TOO_LARGE.name()), StorageNodeErrorBuilder.buildDefault()
@@ -240,6 +240,20 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
         assertEquals(StorageNodeUploadStatus.ERROR.name(), result.status());
         assertNull(result.author());
         assertEquals(2, result.errors().size());
+    }
+
+    @Test
+    @DisplayName("Неуспешное получение статуса загрузки узла - неверный тип узла")
+    void getFileStatus_failed_wrongStorageNodeType() throws Exception {
+        StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeType.FOLDER);
+
+        restTestUtil.getPerform(
+                String.format(GET_STATUS_API_URL, SPACE_ID, storageNode.getId()),
+                Map.of(),
+                TYPE_REF_STRING_RESPONSE,
+                Map.of(),
+                status().isBadRequest()
+        );
     }
 
     @Test

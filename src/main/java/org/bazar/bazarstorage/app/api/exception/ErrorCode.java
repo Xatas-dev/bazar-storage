@@ -9,7 +9,7 @@ public enum ErrorCode {
     // Storage
     STORAGE_NODE_NOT_FOUND_BY_FILE_UUID(HttpStatus.NOT_FOUND, "Storage node not found for file UUID: %s"),
     STORAGE_NODE_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, "Storage node not found for ID: %s"),
-    STORAGE_NODE_WRONG_TYPE_FOR_GETTING_UPLOAD_URL(HttpStatus.BAD_REQUEST, "Storage node #%s has wrong type %s"),
+    STORAGE_NODE_WRONG_TYPE(HttpStatus.BAD_REQUEST, "Storage node #%s has wrong type %s"),
     // Auth
     NOT_AUTHENTICATED(HttpStatus.UNAUTHORIZED, "Not authenticated"),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Insufficient permissions for this action"),

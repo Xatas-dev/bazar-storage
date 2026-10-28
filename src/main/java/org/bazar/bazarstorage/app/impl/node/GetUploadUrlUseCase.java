@@ -37,7 +37,7 @@ public class GetUploadUrlUseCase implements GetUploadUrlInbound {
         StorageNode storageNode = storageNodeRepository.findById(command.nodeId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.STORAGE_NODE_NOT_FOUND_BY_ID, command.nodeId()));
         if (!FILE.equals(storageNode.getType())) {
-            throw new BusinessException(ErrorCode.STORAGE_NODE_WRONG_TYPE_FOR_GETTING_UPLOAD_URL, command.nodeId(), storageNode.getType());
+            throw new BusinessException(ErrorCode.STORAGE_NODE_WRONG_TYPE, command.nodeId(), storageNode.getType());
         }
 
         InitiateUploadCommand initiateUploadCommand = storageNodeMapper.toInitiateUploadCommand(storageNode);
