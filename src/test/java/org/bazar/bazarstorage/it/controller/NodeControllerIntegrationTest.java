@@ -13,8 +13,6 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlRespon
 import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
 import org.bazar.bazarstorage.app.api.node.output.NodeErrorInfo;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
-import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
-import org.bazar.bazarstorage.domain.storagenode.StorageNodeType;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +23,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.bazar.bazarstorage.app.api.properties.SettingProperties.FileValidation.ErrorType.FILE_TOO_LARGE;
+import static org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus.ACTIVE;
 import static org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus.DELETED;
+import static org.bazar.bazarstorage.domain.storagenode.StorageNodeType.FILE;
+import static org.bazar.bazarstorage.domain.storagenode.StorageNodeType.FOLDER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -82,7 +83,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @Test
     @DisplayName("Успешное создание узла с типом Файл с родительским узлом")
     void createNode_file_withParentNode_success() throws Exception {
-        StorageNode parent = testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE, StorageNodeType.FOLDER, Long.parseLong(SPACE_ID));
+        StorageNode parent = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER, Long.parseLong(SPACE_ID));
 
         V1CreateNodeResponse result = restTestUtil.postPerform(
                 String.format(POST_CREATE_NODE_API_URL, SPACE_ID),
@@ -118,7 +119,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @Test
     @DisplayName("Ошибки валидации по созданию узла типа Файл")
     void createNode_file_validationError() throws Exception {
-        StorageNode wrongParent = testDataHelper.createStorageNodeWith(DELETED, StorageNodeType.FILE, 5L);
+        StorageNode wrongParent = testDataHelper.createStorageNodeWith(DELETED, FILE, 5L);
 
         List<NodeErrorInfo> result = restTestUtil.postPerform(
                 String.format(POST_CREATE_NODE_API_URL, SPACE_ID),
@@ -142,7 +143,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @Test
     @DisplayName("Успешное получение URL для загрузки файла")
     void getNodeUploadUrl_success() throws Exception {
-        StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeType.FILE);
+        StorageNode storageNode = testDataHelper.createStorageNodeWith(FILE);
         wireMockTestHelper.stubBazarFilesInitiateUpload_200(
                 storageNode.getNodeName(), String.valueOf(storageNode.getSize()), PDF_CONTENT_TYPE, STORAGE_DOMAIN,
                 "/NodeControllerIntegrationTest/V1InitiateUploadResponseDto.json");
@@ -175,7 +176,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @Test
     @DisplayName("Неуспешное получение URL для загрузки файла - у узла неверный тип")
     void getNodeUploadUrl_failed_storageNodeHasWrongType() throws Exception {
-        StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeType.FOLDER);
+        StorageNode storageNode = testDataHelper.createStorageNodeWith(FOLDER);
 
         restTestUtil.getPerform(
                 String.format(GET_UPLOAD_URL_API_URL, storageNode.getSpaceId(), storageNode.getId()),
@@ -246,7 +247,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @Test
     @DisplayName("Неуспешное получение статуса загрузки узла - неверный тип узла")
     void getFileStatus_failed_wrongStorageNodeType() throws Exception {
-        StorageNode storageNode = testDataHelper.createStorageNodeWith(StorageNodeType.FOLDER);
+        StorageNode storageNode = testDataHelper.createStorageNodeWith(FOLDER);
 
         restTestUtil.getPerform(
                 String.format(GET_STATUS_API_URL, SPACE_ID, storageNode.getId()),
@@ -262,8 +263,8 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     void getNodes_success() throws Exception {
         wireMockTestHelper.stubBazarPersonaGetUsers_200(
                 List.of(JwtBuilder.TEST_USER_ID), "/NodeControllerIntegrationTest/PersonaGetUsersResponse.json");
-        StorageNode firstNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE);
-        StorageNode secondNode = testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE);
+        StorageNode firstNode = testDataHelper.createStorageNodeWith(ACTIVE);
+        StorageNode secondNode = testDataHelper.createStorageNodeWith(ACTIVE);
 
         List<V1GetNodesResponse> result = restTestUtil.getPerform(
                 String.format(GET_NODES_API_URL, SPACE_ID),
@@ -283,7 +284,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     }
 
     @Test
-    @DisplayName("Получение presigned URL для скачивания файла")
+    @DisplayName("Успешное получение presigned URL для скачивания файла")
     void getDownloadUrl_success() throws Exception {
         UUID fileUuid = UUID.randomUUID();
         StorageNode storageNode = testDataHelper.createStorageNodeWith(fileUuid);
@@ -300,6 +301,36 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
 
         assertNotNull(result);
         assertNotNull(result.downloadUrl());
+    }
+
+    @Test
+    @DisplayName("Неуспешное получение presigned URL для скачивания файла - некорректный тип узла")
+    void getDownloadUrl_failed_wrongStorageNodeType() throws Exception {
+        UUID fileUuid = UUID.randomUUID();
+        StorageNode storageNode = testDataHelper.createStorageNodeWith(fileUuid, ACTIVE, FOLDER);
+
+        restTestUtil.getPerform(
+                String.format(GET_DOWNLOAD_URL_API_URL, SPACE_ID, storageNode.getId()),
+                Map.of("fileUuid", fileUuid),
+                TYPE_REF_STRING_RESPONSE,
+                Map.of(),
+                status().isBadRequest()
+        );
+    }
+
+    @Test
+    @DisplayName("Неуспешное получение presigned URL для скачивания файла - некорректный статус узла")
+    void getDownloadUrl_failed_wrongStorageNodeStatus() throws Exception {
+        UUID fileUuid = UUID.randomUUID();
+        StorageNode storageNode = testDataHelper.createStorageNodeWith(fileUuid, DELETED, FILE);
+
+        restTestUtil.getPerform(
+                String.format(GET_DOWNLOAD_URL_API_URL, SPACE_ID, storageNode.getId()),
+                Map.of("fileUuid", fileUuid),
+                TYPE_REF_STRING_RESPONSE,
+                Map.of(),
+                status().isBadRequest()
+        );
     }
 
     @Test
@@ -325,12 +356,12 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     @DisplayName("Удаление папки с вложенными папками и файлами из пространства")
     void deleteNode_folder_success() throws Exception {
         StorageNode storageNodeToDelete =
-                testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE, StorageNodeType.FOLDER, Long.parseLong(SPACE_ID));
+                testDataHelper.createStorageNodeWith(ACTIVE, FOLDER, Long.parseLong(SPACE_ID));
         StorageNode folderStorageNode =
-                testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE, StorageNodeType.FOLDER, Long.parseLong(SPACE_ID), storageNodeToDelete);
-        testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE, StorageNodeType.FOLDER, Long.parseLong(SPACE_ID), storageNodeToDelete);
-        testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE, StorageNodeType.FILE, Long.parseLong(SPACE_ID), storageNodeToDelete);
-        testDataHelper.createStorageNodeWith(StorageNodeStatus.ACTIVE, StorageNodeType.FILE, Long.parseLong(SPACE_ID), folderStorageNode);
+                testDataHelper.createStorageNodeWith(ACTIVE, FOLDER, Long.parseLong(SPACE_ID), storageNodeToDelete);
+        testDataHelper.createStorageNodeWith(ACTIVE, FOLDER, Long.parseLong(SPACE_ID), storageNodeToDelete);
+        testDataHelper.createStorageNodeWith(ACTIVE, FILE, Long.parseLong(SPACE_ID), storageNodeToDelete);
+        testDataHelper.createStorageNodeWith(ACTIVE, FILE, Long.parseLong(SPACE_ID), folderStorageNode);
 
         restTestUtil.deletePerform(
                 String.format(DELETE_NODE_API_URL, SPACE_ID, storageNodeToDelete.getId()),
