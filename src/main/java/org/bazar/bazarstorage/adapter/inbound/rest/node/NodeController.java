@@ -14,6 +14,7 @@ import org.bazar.bazarstorage.app.api.node.GetFileStatusInbound;
 import org.bazar.bazarstorage.app.api.node.GetNodesBySpaceIdInbound;
 import org.bazar.bazarstorage.app.api.node.CreateNodeInbound;
 import org.bazar.bazarstorage.app.api.node.commands.DeleteNodeCommand;
+import org.bazar.bazarstorage.app.api.node.commands.GetDownloadUrlCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetNodesBySpaceIdCommand;
 import org.bazar.bazarstorage.app.api.node.commands.CreateNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
@@ -73,7 +74,8 @@ public class NodeController implements NodeControllerSwagger {
 
     @GetMapping("/{nodeId}/download")
     public V1GetDownloadUrlResponse getUrlForDownload(@PathVariable String spaceId, @PathVariable String nodeId) {
-        DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(spaceId, nodeId);
+        GetDownloadUrlCommand command = restNodeMapper.toDownloadCommand(spaceId, nodeId);
+        DownloadUrlInfo urlInfo = getDownloadUrlInbound.execute(command);
         return restNodeMapper.toResponse(urlInfo);
     }
 
