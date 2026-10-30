@@ -66,8 +66,8 @@ public class NodeController implements NodeControllerSwagger {
     }
 
     @GetMapping
-    public V1GetNodesPaginationResponse getNodes(@PathVariable String spaceId, @PageableDefault(size = 20) Pageable pageable) {
-        GetNodesBySpaceIdCommand command = restNodeMapper.toCommand(spaceId, pageable);
+    public V1GetNodesPaginationResponse getNodes(@PathVariable String spaceId, String parentId, @PageableDefault(size = 20) Pageable pageable) {
+        GetNodesBySpaceIdCommand command = restNodeMapper.toCommand(spaceId, parentId, pageable);
         NodeInfoPage nodeInfoPage = getNodesBySpaceIdInbound.execute(command);
         return restNodeMapper.toResponse(nodeInfoPage);
     }

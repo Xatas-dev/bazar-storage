@@ -25,7 +25,7 @@ public interface RestNodeMapper {
 
     GetUploadUrlCommand toCommand(String spaceId, String nodeId);
 
-    GetNodesBySpaceIdCommand toCommand(String spaceId, Pageable pageable);
+    GetNodesBySpaceIdCommand toCommand(String spaceId, String parentId, Pageable pageable);
 
     DeleteNodeCommand toDeleteCommand(String spaceId, String nodeId);
 

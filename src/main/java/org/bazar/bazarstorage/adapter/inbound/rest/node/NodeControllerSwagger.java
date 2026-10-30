@@ -36,7 +36,7 @@ public interface NodeControllerSwagger {
     @ApiResponse(responseCode = "200", description = "Успешный ответ",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = V1GetNodesPaginationResponse.class)))
     @ApiResponse(responseCode = "400", description = "Некорректный запрос")
-    V1GetNodesPaginationResponse getNodes(String spaceId, @ParameterObject Pageable pageable);
+    V1GetNodesPaginationResponse getNodes(String spaceId, String parentId, @ParameterObject Pageable pageable);
 
     @Operation(summary = "Получить URL для скачивания файла", description = "Возвращает URL для скачивания файла")
     @ApiResponse(responseCode = "200", description = "Успешный ответ",

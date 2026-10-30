@@ -31,9 +31,26 @@ public class StorageNodeJpaRepositoryAdapter implements StorageNodeRepository {
     }
 
     @Override
-    public Page<StorageNode> findActiveNodes(Long spaceId, Pageable pageable) {
-        return storageNodeJpaRepository.findBySpaceIdAndStatusAndUploadedStatusOrType(
-                spaceId, StorageNodeStatus.ACTIVE, StorageNodeUploadStatus.UPLOADED, StorageNodeType.FOLDER, pageable
+    public Page<StorageNode> findActiveNodes(Long spaceId, Long parentId, Pageable pageable) {
+        if (parentId == null) {
+            return storageNodeJpaRepository.findNodesWithoutParent(
+                    spaceId,
+                    StorageNodeStatus.ACTIVE,
+                    StorageNodeType.FOLDER,
+                    StorageNodeUploadStatus.UPLOADED,
+                    pageable
+            );
+        }
+
+        return storageNodeJpaRepository.findChildren(
+                spaceId,
+                StorageNodeStatus.ACTIVE,
+                parentId,
+                StorageNodeStatus.ACTIVE,
+                StorageNodeType.FOLDER,
+                StorageNodeType.FOLDER,
+                StorageNodeUploadStatus.UPLOADED,
+                pageable
         );
     }
 

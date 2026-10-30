@@ -46,7 +46,7 @@ public abstract class StorageNodeMapper {
     @Mapping(target = "fileUuid", ignore = true)
     public abstract StorageNode toDomain(CreateNodeCommand command, StorageNode parent, UUID userId);
 
-    @Mapping(target = "fileName", source = "storageNode.nodeName")
+    @Mapping(target = "nodeName", source = "storageNode.nodeName")
     @Mapping(target = "uploadedAt", source = "storageNode.createdAt")
     @Mapping(target = "author", expression = "java(toAuthorInfo(user, status))")
     @Mapping(target = "nodeId", source = "storageNode.id")
