@@ -16,6 +16,10 @@ public interface StorageNodeRepository {
 
     Page<StorageNode> findActiveNodes(Long spaceId, Long parentId, Pageable pageable);
 
+    Optional<StorageNode> findActiveNode(Long spaceId, Long nodeId);
+
+    boolean existsInParentChain(Long spaceId, Long nodeId, Long parentId);
+
     Optional<StorageNode> findById(Long nodeId);
 
     List<StorageNode> findDeletedNodesAfterIdWithRetention(Long lastId, Instant retentionThreshold, Integer batchSize);
@@ -25,4 +29,6 @@ public interface StorageNodeRepository {
     int updateFileUuid(Long nodeId, UUID fileUuid);
 
     List<StorageNode> findAllDescendants(Long nodeId);
+
+    void lockSpace(Long spaceId);
 }

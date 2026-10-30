@@ -12,8 +12,10 @@ public abstract class AbstractControllerIntegrationTest extends AbstractIntegrat
     protected static final String GET_NODES_API_URL = "/api/v1/spaces/%s/nodes";
     protected static final String GET_DOWNLOAD_URL_API_URL = "/api/v1/spaces/%s/nodes/%s/download";
     protected static final String DELETE_NODE_API_URL = "/api/v1/spaces/%s/nodes/%s";
+    protected static final String PATCH_NODE_API_URL = "/api/v1/spaces/%s/nodes/%s";
 
     protected static final TypeReference<String> TYPE_REF_STRING_RESPONSE = new TypeReference<>() {};
+    protected static final TypeReference<Void> TYPE_REF_VOID_RESPONSE = new TypeReference<>() {};
 
     @Autowired
     protected RestTestUtil restTestUtil;

@@ -10,6 +10,7 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusRespo
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1UpdateNodeRequest;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 
@@ -44,8 +45,14 @@ public interface NodeControllerSwagger {
     @ApiResponse(responseCode = "400", description = "Некорректный запрос")
     V1GetDownloadUrlResponse getUrlForDownload(String spaceId, String nodeId);
 
-    @Operation(summary = "Удалить узел из пространства", description = "Возвращает успешный ответ при удалении файла")
+    @Operation(summary = "Удалить узел из пространства", description = "Возвращает успешный ответ при удалении узла")
     @ApiResponse(responseCode = "200", description = "Успешный ответ")
     @ApiResponse(responseCode = "400", description = "Некорректный запрос")
     void deleteNode(String spaceId, String nodeId);
+
+    @Operation(summary = "Обновить узел в пространстве", description = "Возвращает успешный ответ при обновлении узла")
+    @ApiResponse(responseCode = "200", description = "Успешный ответ")
+    @ApiResponse(responseCode = "400", description = "Некорректный запрос")
+    @ApiResponse(responseCode = "404", description = "Целевой или родительский узел не найден")
+    void updateNode(String spaceId, String nodeId, V1UpdateNodeRequest request);
 }

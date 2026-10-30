@@ -11,6 +11,7 @@ public enum ErrorCode {
     STORAGE_NODE_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, "Storage node not found for ID: %s"),
     STORAGE_NODE_WRONG_TYPE(HttpStatus.BAD_REQUEST, "Storage node #%s has wrong type %s"),
     STORAGE_NODE_WRONG_STATUS(HttpStatus.BAD_REQUEST, "Storage node #%s has wrong status %s"),
+    STORAGE_NODE_CYCLE_DETECTED(HttpStatus.CONFLICT, "Storage node #%s can not move to #%s parent because of cycle"),
     // Auth
     NOT_AUTHENTICATED(HttpStatus.UNAUTHORIZED, "Not authenticated"),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Insufficient permissions for this action"),

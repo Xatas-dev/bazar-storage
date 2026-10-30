@@ -51,6 +51,44 @@ public interface StorageNodeJpaRepository extends JpaRepository<StorageNode, Lon
                                    StorageNodeType parentType, StorageNodeType type, StorageNodeUploadStatus uploadStatus,
                                    Pageable pageable);
 
+    @Query("""
+    SELECT sn
+    FROM StorageNode sn
+    WHERE sn.spaceId = :spaceId
+      AND sn.id = :id
+      AND sn.status = :status
+      AND (
+          sn.type = :type
+          OR sn.uploadStatus = :uploadStatus
+      )
+    """)
+    Optional<StorageNode> findBySpaceIdAndIdAndStatusAndTypeOrUploadStatus(Long spaceId, Long id, StorageNodeStatus status,
+                                                                           StorageNodeType type, StorageNodeUploadStatus uploadStatus);
+
+    @Query(value = """
+    WITH RECURSIVE parent_chain AS (
+        SELECT id, parent_id
+        FROM storage_node
+        WHERE id = :parentId
+          AND space_id = :spaceId
+          AND status = 'ACTIVE'
+
+        UNION
+
+        SELECT sn.id, sn.parent_id
+        FROM storage_node sn
+        JOIN parent_chain pc ON sn.id = pc.parent_id
+        WHERE sn.space_id = :spaceId
+          AND sn.status = 'ACTIVE'
+    )
+    SELECT EXISTS (
+        SELECT 1
+        FROM parent_chain
+        WHERE id = :nodeId
+    )
+    """, nativeQuery = true)
+    boolean existsInParentChain(Long spaceId, Long nodeId, Long parentId);
+
     @Query(value = """
     SELECT *
     FROM storage_node sn
@@ -88,4 +126,7 @@ public interface StorageNodeJpaRepository extends JpaRepository<StorageNode, Lon
     JOIN node_tree nt ON nt.id = sn.id
     """, nativeQuery = true)
     List<StorageNode> findAllWithRecursive(@Param("nodeId") Long nodeId);
+
+    @Query(value = "SELECT pg_advisory_xact_lock(:spaceId)", nativeQuery = true)
+    void lockSpace(Long spaceId);
 }

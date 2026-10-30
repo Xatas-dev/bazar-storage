@@ -10,6 +10,7 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusRespo
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1UpdateNodeRequest;
 import org.bazar.bazarstorage.app.api.node.output.AuthorStatus;
 import org.bazar.bazarstorage.app.api.node.output.NodeErrorInfo;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
@@ -367,7 +368,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
                 String.format(DELETE_NODE_API_URL, SPACE_ID, storageNode.getId()),
                 Map.of(),
                 null,
-                new TypeReference<Void>() {},
+                TYPE_REF_VOID_RESPONSE,
                 Map.of(),
                 status().isOk()
         );
@@ -392,7 +393,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
                 String.format(DELETE_NODE_API_URL, SPACE_ID, storageNodeToDelete.getId()),
                 Map.of(),
                 null,
-                new TypeReference<Void>() {},
+                TYPE_REF_VOID_RESPONSE,
                 Map.of(),
                 status().isOk()
         );
@@ -413,6 +414,85 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
                 TYPE_REF_STRING_RESPONSE,
                 Map.of(),
                 status().isForbidden()
+        );
+    }
+
+    @Test
+    @DisplayName("Успешное обновление родительского узла")
+    void updateNode_success() throws Exception {
+        StorageNode parent = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER);
+        StorageNode nodeToUpdate = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER, parent);
+        StorageNode newParent = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER);
+        V1UpdateNodeRequest request = new V1UpdateNodeRequest();
+        request.setParentId(newParent.getId());
+
+        restTestUtil.patchPerform(
+                String.format(PATCH_NODE_API_URL, SPACE_ID, nodeToUpdate.getId()),
+                Map.of(),
+                request,
+                TYPE_REF_VOID_RESPONSE,
+                Map.of(),
+                status().isOk()
+        );
+
+        StorageNode nodeAfterUpdate = storageNodeJpaRepository.findById(nodeToUpdate.getId()).get();
+        assertEquals(newParent.getId(), nodeAfterUpdate.getParent().getId());
+    }
+
+    @Test
+    @DisplayName("Успешное обновление родительского узла - ничего не меняется")
+    void updateNode_success_parentIdNullAndProvided() throws Exception {
+        StorageNode parent = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER);
+        StorageNode nodeToUpdate = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER, parent);
+        V1UpdateNodeRequest request = new V1UpdateNodeRequest();
+
+        restTestUtil.patchPerform(
+                String.format(PATCH_NODE_API_URL, SPACE_ID, nodeToUpdate.getId()),
+                Map.of(),
+                request,
+                TYPE_REF_VOID_RESPONSE,
+                Map.of(),
+                status().isOk()
+        );
+
+        StorageNode nodeAfterUpdate = storageNodeJpaRepository.findById(nodeToUpdate.getId()).get();
+        assertEquals(parent.getId(), nodeAfterUpdate.getParent().getId());
+    }
+
+    @Test
+    @DisplayName("Неуспешное обновление родительского узла - некорректный тип родителя")
+    void updateNode_failed_wrongParentType() throws Exception {
+        StorageNode nodeToUpdate = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER);
+        StorageNode parent = testDataHelper.createStorageNodeWith(ACTIVE, FILE);
+        V1UpdateNodeRequest request = new V1UpdateNodeRequest();
+        request.setParentId(parent.getId());
+
+        restTestUtil.patchPerform(
+                String.format(PATCH_NODE_API_URL, SPACE_ID, nodeToUpdate.getId()),
+                Map.of(),
+                request,
+                TYPE_REF_STRING_RESPONSE,
+                Map.of(),
+                status().isBadRequest()
+        );
+    }
+
+    @Test
+    @DisplayName("Неуспешное обновление родительского узла - создание цила")
+    void updateNode_failed_cycle() throws Exception {
+        StorageNode nodeToUpdate = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER);
+        StorageNode child1 = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER, nodeToUpdate);
+        StorageNode child2 = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER, child1);
+        V1UpdateNodeRequest request = new V1UpdateNodeRequest();
+        request.setParentId(child2.getId());
+
+        restTestUtil.patchPerform(
+                String.format(PATCH_NODE_API_URL, SPACE_ID, nodeToUpdate.getId()),
+                Map.of(),
+                request,
+                TYPE_REF_STRING_RESPONSE,
+                Map.of(),
+                status().isConflict()
         );
     }
 }

@@ -27,6 +27,8 @@ class MarkNodeForDeletionUseCase implements MarkNodeForDeletionInbound {
     @Transactional
     @Authorize(spaceIdParam = "#command.spaceId", permission = STORAGE_NODE_DELETE)
     public void execute(DeleteNodeCommand command) {
+        storageNodeRepository.lockSpace(command.spaceId());
+
         List<StorageNode> storageNodes = storageNodeRepository.findAllDescendants(command.nodeId());
 
         storageNodes.forEach(storageNode -> statusChanger.changeStatus(storageNode, StorageNodeStatus.DELETED));
