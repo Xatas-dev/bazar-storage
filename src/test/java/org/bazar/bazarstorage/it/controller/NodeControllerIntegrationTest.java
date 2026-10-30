@@ -276,11 +276,36 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
 
         assertEquals(2, result.size());
         V1GetNodesResponse firstResultNode = result.getFirst();
-        assertEquals(secondNode.getNodeName(), firstResultNode.fileName());
+        assertEquals(secondNode.getNodeName(), firstResultNode.nodeName());
         assertEquals(secondNode.getId().toString(), firstResultNode.nodeId());
         V1GetNodesResponse secondResultNode = result.get(1);
-        assertEquals(firstNode.getNodeName(), secondResultNode.fileName());
+        assertEquals(firstNode.getNodeName(), secondResultNode.nodeName());
         assertEquals(firstNode.getId().toString(), secondResultNode.nodeId());
+    }
+
+    @Test
+    @DisplayName("Получение узлов хранилища по пространству и родителю")
+    void getNodes_success_withParent() throws Exception {
+        wireMockTestHelper.stubBazarPersonaGetUsers_200(
+                List.of(JwtBuilder.TEST_USER_ID), "/NodeControllerIntegrationTest/PersonaGetUsersResponse.json");
+        StorageNode parentNode = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER);
+        StorageNode childNode1 = testDataHelper.createStorageNodeWith(ACTIVE, FILE, parentNode);
+        StorageNode childNode2 = testDataHelper.createStorageNodeWith(ACTIVE, FOLDER, parentNode);
+        testDataHelper.createStorageNodeWith(DELETED, FILE, parentNode);
+
+        List<V1GetNodesResponse> result = restTestUtil.getPerform(
+                String.format(GET_NODES_API_URL, SPACE_ID),
+                Map.of("parentId", parentNode.getId()),
+                TYPE_REF_V1_GET_NODES_PAGINATION_RESPONSE,
+                Map.of(),
+                status().isOk()
+        ).content();
+
+        assertEquals(2, result.size());
+        V1GetNodesResponse firstResultNode = result.getFirst();
+        assertEquals(childNode2.getId().toString(), firstResultNode.nodeId());
+        V1GetNodesResponse secondResultNode = result.get(1);
+        assertEquals(childNode1.getId().toString(), secondResultNode.nodeId());
     }
 
     @Test

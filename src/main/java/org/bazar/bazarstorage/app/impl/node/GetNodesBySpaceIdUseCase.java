@@ -36,7 +36,7 @@ public class GetNodesBySpaceIdUseCase implements GetNodesBySpaceIdInbound {
     @Authorize(spaceIdParam = "#command.spaceId", permission = STORAGE_NODE_READ)
     public NodeInfoPage execute(GetNodesBySpaceIdCommand command) {
         Page<StorageNode> storageNodes =
-                storageNodeRepository.findActiveNodes(command.spaceId(), normalize(command.pageable()));
+                storageNodeRepository.findActiveNodes(command.spaceId(), command.parentId(), normalize(command.pageable()));
         Map<UUID, User> usersMap = userLoader.loadUsers(storageNodes.getContent());
         Page<NodeInfo> dtoPage = storageNodes.map(storageNode -> {
                     User user = usersMap.get(storageNode.getUserId());

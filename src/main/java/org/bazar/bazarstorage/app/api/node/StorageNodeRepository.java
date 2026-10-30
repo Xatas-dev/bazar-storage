@@ -14,7 +14,7 @@ public interface StorageNodeRepository {
 
     Optional<StorageNode> findByFileUuid(String fileUuid);
 
-    Page<StorageNode> findActiveNodes(Long spaceId, Pageable pageable);
+    Page<StorageNode> findActiveNodes(Long spaceId, Long parentId, Pageable pageable);
 
     Optional<StorageNode> findById(Long nodeId);
 

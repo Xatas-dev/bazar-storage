@@ -20,11 +20,36 @@ public interface StorageNodeJpaRepository extends JpaRepository<StorageNode, Lon
     Optional<StorageNode> findByFileUuid(UUID fileUuid);
 
     @Query("""
-    SELECT sn FROM StorageNode sn
-    WHERE sn.spaceId = :spaceId AND sn.status = :status AND (sn.type = :type OR sn.uploadStatus = :uploadStatus)
+    SELECT sn
+    FROM StorageNode sn
+    WHERE sn.spaceId = :spaceId
+      AND sn.status = :status
+      AND sn.parent IS NULL
+      AND (
+          sn.type = :type
+          OR sn.uploadStatus = :uploadStatus
+      )
     """)
-    Page<StorageNode> findBySpaceIdAndStatusAndUploadedStatusOrType(Long spaceId, StorageNodeStatus status,
-            StorageNodeUploadStatus uploadStatus, StorageNodeType type, Pageable pageable);
+    Page<StorageNode> findNodesWithoutParent(Long spaceId, StorageNodeStatus status, StorageNodeType type, StorageNodeUploadStatus uploadStatus,
+                                    Pageable pageable);
+
+    @Query("""
+    SELECT sn
+    FROM StorageNode sn
+    JOIN sn.parent parent
+    WHERE sn.spaceId = :spaceId
+      AND sn.status = :status
+      AND parent.id = :parentId
+      AND parent.status = :parentStatus
+      AND parent.type = :parentType
+      AND (
+          sn.type = :type
+          OR sn.uploadStatus = :uploadStatus
+      )
+    """)
+    Page<StorageNode> findChildren(Long spaceId, StorageNodeStatus status, Long parentId, StorageNodeStatus parentStatus,
+                                   StorageNodeType parentType, StorageNodeType type, StorageNodeUploadStatus uploadStatus,
+                                   Pageable pageable);
 
     @Query(value = """
     SELECT *

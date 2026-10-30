@@ -52,6 +52,20 @@ public class TestDataHelper {
         return storageNodeJpaRepository.save(StorageNodeBuilder.buildWith(status));
     }
 
+
+    public StorageNode createStorageNodeWith(StorageNodeStatus status, StorageNodeType type) {
+        StorageNode storageNode = StorageNodeBuilder.buildWith(status);
+        storageNode.setType(type);
+        return storageNodeJpaRepository.save(storageNode);
+    }
+
+    public StorageNode createStorageNodeWith(StorageNodeStatus status, StorageNodeType type, StorageNode parent) {
+        StorageNode storageNode = StorageNodeBuilder.buildWith(status);
+        storageNode.setType(type);
+        storageNode.setParent(parent);
+        return storageNodeJpaRepository.save(storageNode);
+    }
+
     public StorageNode createStorageNodeWith(StorageNodeUploadStatus status, List<StorageNodeError> errors) {
         StorageNode storageNode = StorageNodeBuilder.buildWith(status);
         storageNode.setErrors(errors);
