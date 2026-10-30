@@ -7,17 +7,20 @@ import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetDownloadUrlResp
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1UpdateNodeRequest;
 import org.bazar.bazarstorage.app.api.node.GetUploadUrlInbound;
 import org.bazar.bazarstorage.app.api.node.MarkNodeForDeletionInbound;
 import org.bazar.bazarstorage.app.api.node.GetDownloadUrlInbound;
 import org.bazar.bazarstorage.app.api.node.GetFileStatusInbound;
 import org.bazar.bazarstorage.app.api.node.GetNodesBySpaceIdInbound;
 import org.bazar.bazarstorage.app.api.node.CreateNodeInbound;
+import org.bazar.bazarstorage.app.api.node.UpdateNodeInbound;
 import org.bazar.bazarstorage.app.api.node.commands.DeleteNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetDownloadUrlCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetNodesBySpaceIdCommand;
 import org.bazar.bazarstorage.app.api.node.commands.CreateNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
+import org.bazar.bazarstorage.app.api.node.commands.UpdateNodeCommand;
 import org.bazar.bazarstorage.app.api.node.output.DownloadUrlInfo;
 import org.bazar.bazarstorage.app.api.node.output.FileStatusInfo;
 import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
@@ -27,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +48,7 @@ public class NodeController implements NodeControllerSwagger {
     private final GetDownloadUrlInbound getDownloadUrlInbound;
     private final MarkNodeForDeletionInbound markNodeForDeletionInbound;
     private final GetUploadUrlInbound getUploadUrlInbound;
+    private final UpdateNodeInbound updateNodeInbound;
 
     @PostMapping
     public V1CreateNodeResponse createNode(@RequestBody V1CreateNodeRequest request, @PathVariable String spaceId) {
@@ -83,5 +88,11 @@ public class NodeController implements NodeControllerSwagger {
     public void deleteNode(@PathVariable String spaceId, @PathVariable String nodeId) {
         DeleteNodeCommand command = restNodeMapper.toDeleteCommand(spaceId, nodeId);
         markNodeForDeletionInbound.execute(command);
+    }
+
+    @PatchMapping("/{nodeId}")
+    public void updateNode(@PathVariable String spaceId, @PathVariable String nodeId, @RequestBody V1UpdateNodeRequest request) {
+        UpdateNodeCommand command = restNodeMapper.toCommand(spaceId, nodeId, request);
+        updateNodeInbound.execute(command);
     }
 }

@@ -38,6 +38,8 @@ public class CreateNodeUseCase implements CreateNodeInbound {
     @Authorize(spaceIdParam = "#command.spaceId", permission = STORAGE_NODE_UPLOAD) // TODO: выделить в auth отдельный пермишен на создание узла или переименовать текущий
     @Transactional
     public CreatedNodeInfo execute(CreateNodeCommand command) {
+        storageNodeRepository.lockSpace(command.spaceId());
+
         StorageNode parentNode = getParentNode(command.parentId());
         List<StorageNodeError> validationErrors = validateCommand(command, parentNode);
         if (!validationErrors.isEmpty()) {

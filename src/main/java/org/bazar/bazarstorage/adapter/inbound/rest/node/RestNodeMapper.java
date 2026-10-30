@@ -1,20 +1,22 @@
 package org.bazar.bazarstorage.adapter.inbound.rest.node;
 
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeRequest;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetDownloadUrlResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetFileStatusResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetNodesPaginationResponse;
-import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1CreateNodeResponse;
 import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1GetUploadUrlResponse;
+import org.bazar.bazarstorage.adapter.inbound.rest.node.dto.V1UpdateNodeRequest;
+import org.bazar.bazarstorage.app.api.node.commands.CreateNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.DeleteNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetDownloadUrlCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetNodesBySpaceIdCommand;
-import org.bazar.bazarstorage.app.api.node.commands.CreateNodeCommand;
 import org.bazar.bazarstorage.app.api.node.commands.GetUploadUrlCommand;
+import org.bazar.bazarstorage.app.api.node.commands.UpdateNodeCommand;
+import org.bazar.bazarstorage.app.api.node.output.CreatedNodeInfo;
 import org.bazar.bazarstorage.app.api.node.output.DownloadUrlInfo;
 import org.bazar.bazarstorage.app.api.node.output.FileStatusInfo;
 import org.bazar.bazarstorage.app.api.node.output.NodeInfoPage;
-import org.bazar.bazarstorage.app.api.node.output.CreatedNodeInfo;
 import org.bazar.bazarstorage.app.api.node.output.UploadUrlInfo;
 import org.mapstruct.Mapper;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +32,8 @@ public interface RestNodeMapper {
     DeleteNodeCommand toDeleteCommand(String spaceId, String nodeId);
 
     GetDownloadUrlCommand toDownloadCommand(String spaceId, String nodeId);
+
+    UpdateNodeCommand toCommand(String spaceId, String nodeId, V1UpdateNodeRequest request);
 
     V1CreateNodeResponse toResponse(CreatedNodeInfo createdNodeInfo);
 
