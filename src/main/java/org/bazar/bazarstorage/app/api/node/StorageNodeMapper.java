@@ -39,6 +39,7 @@ public abstract class StorageNodeMapper {
     @Mapping(target = "spaceId", source = "command.spaceId")
     @Mapping(target = "size", source = "command.size")
     @Mapping(target = "parent", source = "parent")
+    @Mapping(target = "userId", source = "userId")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
