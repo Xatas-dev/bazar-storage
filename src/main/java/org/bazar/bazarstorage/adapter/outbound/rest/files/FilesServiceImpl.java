@@ -19,6 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FilesServiceImpl implements FilesService {
     private static final String DOMAIN = "STORAGE";
+    private static final String ACCESS_TYPE = "PRIVATE";
 
     private final FilesFeignClient feignClient;
     private final FilesMapper mapper;
@@ -31,7 +32,8 @@ public class FilesServiceImpl implements FilesService {
                     command.fileName(),
                     command.size(),
                     contentType.toString(),
-                    DOMAIN
+                    DOMAIN,
+                    ACCESS_TYPE
             );
             return mapper.toUploadUrlInfo(response);
         } catch (FeignException e) {
