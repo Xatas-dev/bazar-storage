@@ -45,6 +45,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     private static final Long INVALID_SIZE = 13123123123123132L;
     private static final String PDF_CONTENT_TYPE = "application/pdf";
     private static final String STORAGE_DOMAIN = "STORAGE";
+    private static final String PRIVATE_ACCESS_TYPE = "PRIVATE";
     private static final String FILE_TOO_LARGE_MESSAGE = "Размер файла не может превышать 50 МБ";
     private static final String FILE_EXTENSION_NOT_ALLOWED_MESSAGE = "Невозможно загрузить файл с таким расширением";
     private static final String FILE_NAME_TOO_LARGE_MESSAGE = "Длина имени файла не может превышать 100 символов";
@@ -97,7 +98,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
 
         assertNotNull(result);
         assertNotNull(result.nodeId());
-        StorageNode savedNode = storageNodeJpaRepository.findById(Long.parseLong(result.nodeId())).get();
+        StorageNode savedNode = storageNodeJpaRepository.findById(Long.parseLong(result.nodeId())).orElseThrow();
         assertEquals(parent.getId(), savedNode.getParent().getId());
     }
 
@@ -146,7 +147,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
     void getNodeUploadUrl_success() throws Exception {
         StorageNode storageNode = testDataHelper.createStorageNodeWith(FILE);
         wireMockTestHelper.stubBazarFilesInitiateUpload_200(
-                storageNode.getNodeName(), String.valueOf(storageNode.getSize()), PDF_CONTENT_TYPE, STORAGE_DOMAIN,
+                storageNode.getNodeName(), String.valueOf(storageNode.getSize()), PDF_CONTENT_TYPE, STORAGE_DOMAIN, PRIVATE_ACCESS_TYPE,
                 "/NodeControllerIntegrationTest/V1InitiateUploadResponseDto.json");
 
         V1GetUploadUrlResponse result = restTestUtil.getPerform(
@@ -158,7 +159,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
         );
 
         assertEquals("http://s3-test/files/d628bc48-a393-4b19-a640-2c16773e0dec", result.uploadUrl());
-        StorageNode storageNodeAfter = storageNodeJpaRepository.findById(storageNode.getId()).get();
+        StorageNode storageNodeAfter = storageNodeJpaRepository.findById(storageNode.getId()).orElseThrow();
         assertEquals("d628bc48-a393-4b19-a640-2c16773e0dec", storageNodeAfter.getFileUuid().toString());
     }
 
@@ -435,7 +436,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
                 status().isOk()
         );
 
-        StorageNode nodeAfterUpdate = storageNodeJpaRepository.findById(nodeToUpdate.getId()).get();
+        StorageNode nodeAfterUpdate = storageNodeJpaRepository.findById(nodeToUpdate.getId()).orElseThrow();
         assertEquals(newParent.getId(), nodeAfterUpdate.getParent().getId());
     }
 
@@ -455,7 +456,7 @@ public class NodeControllerIntegrationTest extends AbstractControllerIntegration
                 status().isOk()
         );
 
-        StorageNode nodeAfterUpdate = storageNodeJpaRepository.findById(nodeToUpdate.getId()).get();
+        StorageNode nodeAfterUpdate = storageNodeJpaRepository.findById(nodeToUpdate.getId()).orElseThrow();
         assertEquals(parent.getId(), nodeAfterUpdate.getParent().getId());
     }
 
