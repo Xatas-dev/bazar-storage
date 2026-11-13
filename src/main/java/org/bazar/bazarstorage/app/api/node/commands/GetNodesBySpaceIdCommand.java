@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 
 public record GetNodesBySpaceIdCommand(
         Long spaceId,
+        Long parentId,
         Pageable pageable
 ) {
 }

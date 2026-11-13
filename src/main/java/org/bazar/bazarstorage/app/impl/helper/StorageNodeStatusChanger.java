@@ -3,6 +3,7 @@ package org.bazar.bazarstorage.app.impl.helper;
 import lombok.extern.slf4j.Slf4j;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -10,26 +11,29 @@ import java.util.List;
 @Component
 @Slf4j
 public class StorageNodeStatusChanger {
-    private static final List<StorageNodeStatus> TERMINAL_STATUSES =
-            List.of(StorageNodeStatus.ERROR, StorageNodeStatus.DELETED);
+    private static final List<StorageNodeUploadStatus> TERMINAL_UPLOAD_STATUSES = List.of(StorageNodeUploadStatus.ERROR);
 
-    public void changeStatus(StorageNode storageNode, StorageNodeStatus status) {
-        StorageNodeStatus oldStatus = storageNode.getStatus();
+    public void changeUploadStatus(StorageNode storageNode, StorageNodeUploadStatus status) {
+        StorageNodeUploadStatus oldStatus = storageNode.getUploadStatus();
 
         if (oldStatus == status) {
-            log.warn("StorageNode {} already has status {}, no change needed", storageNode.getId(), status);
+            log.warn("StorageNode {} already has uploadStatus {}, no change needed", storageNode.getId(), status);
             return;
         }
-        if (TERMINAL_STATUSES.contains(oldStatus)) {
-            log.error("StorageNode {} is in terminal status {}, cannot change to {}", storageNode.getId(), oldStatus, status);
+        if (TERMINAL_UPLOAD_STATUSES.contains(oldStatus)) {
+            log.error("StorageNode {} is in terminal uploadStatus {}, cannot change to {}", storageNode.getId(), oldStatus, status);
             return;
         }
-        if (oldStatus == StorageNodeStatus.UPLOADED && status == StorageNodeStatus.IN_PROGRESS) {
-            log.error("StorageNode {} has status {}, cannot change status to {}", storageNode.getId(), oldStatus, status);
+        if (oldStatus == StorageNodeUploadStatus.UPLOADED && status == StorageNodeUploadStatus.IN_PROGRESS) {
+            log.error("StorageNode {} has uploadStatus {}, cannot change uploadStatus to {}", storageNode.getId(), oldStatus, status);
             return;
         }
 
+        storageNode.setUploadStatus(status);
+        log.info("StorageNode {} uploadStatus changed from {} to {}", storageNode.getId(), oldStatus, status);
+    }
+
+    public void changeStatus(StorageNode storageNode, StorageNodeStatus status) {
         storageNode.setStatus(status);
-        log.info("StorageNode {} status changed from {} to {}", storageNode.getId(), oldStatus, status);
     }
 }

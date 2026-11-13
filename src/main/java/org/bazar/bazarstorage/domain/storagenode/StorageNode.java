@@ -28,6 +28,10 @@ public class StorageNode extends DomainObject {
     @Enumerated(EnumType.STRING)
     private StorageNodeStatus status;
 
+    @Column(name = "upload_status")
+    @Enumerated(EnumType.STRING)
+    private StorageNodeUploadStatus uploadStatus;
+
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private StorageNodeType type;

@@ -12,6 +12,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.bazar.bazarstorage.it.testutil.TestDataTransformUtil.readFileWithoutThrow;
 
@@ -19,7 +20,7 @@ import static org.bazar.bazarstorage.it.testutil.TestDataTransformUtil.readFileW
 public class WireMockTestHelper {
     private static final String GET_USERS_BAZAR_PERSONA = "/users";
     private static final String INITIATE_UPLOAD_BAZAR_FILES = "/api/v1/files/initiate-upload";
-    private static final String INITIATE_DOWNLOAD_BAZAR_FILES = "/api/v1/files/initiate-download";
+    private static final String INITIATE_DOWNLOAD_BAZAR_FILES = "/api/v1/files/%s/initiate-download";
     private static final String DELETE_FILE_BY_FILE_UUID_BAZAR_FILES = "/api/v1/files/%s";
 
     @Autowired
@@ -56,12 +57,14 @@ public class WireMockTestHelper {
         bazarPersonaServer.stubFor(mapping);
     }
 
-    public void stubBazarFilesInitiateUpload_200(String fileName, String size, String contentType, String domain, String bodyPath) {
-        bazarFilesServer.stubFor(get(urlPathEqualTo(INITIATE_UPLOAD_BAZAR_FILES))
+    public void stubBazarFilesInitiateUpload_200(String fileName, String size, String contentType, String domain,
+                                                 String accessType, String bodyPath) {
+        bazarFilesServer.stubFor(post(urlPathEqualTo(INITIATE_UPLOAD_BAZAR_FILES))
                 .withQueryParam("fileName", equalTo(fileName))
                 .withQueryParam("size", equalTo(size))
                 .withQueryParam("contentType", equalTo(contentType))
                 .withQueryParam("domain", equalTo(domain))
+                .withQueryParam("accessType", equalTo(accessType))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -69,8 +72,7 @@ public class WireMockTestHelper {
     }
 
     public void stubBazarFilesInitiateDownload_200(String fileUuid, String bodyPath) {
-        bazarFilesServer.stubFor(get(urlPathEqualTo(INITIATE_DOWNLOAD_BAZAR_FILES))
-                .withQueryParam("fileUuid", equalTo(fileUuid))
+        bazarFilesServer.stubFor(get(urlPathEqualTo(String.format(INITIATE_DOWNLOAD_BAZAR_FILES, fileUuid)))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")

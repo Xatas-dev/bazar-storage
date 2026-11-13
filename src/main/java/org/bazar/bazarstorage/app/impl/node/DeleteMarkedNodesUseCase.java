@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.temporal.ChronoUnit.DAYS;
+import static org.bazar.bazarstorage.domain.storagenode.StorageNodeType.FILE;
 
 @Component
 @RequiredArgsConstructor
@@ -40,7 +41,7 @@ public class DeleteMarkedNodesUseCase implements DeleteMarkedNodesInbound {
 
             List<Long> successfullyDeletedIds = new ArrayList<>();
             nodesToDelete.forEach(storageNode -> {
-                if (deleteFromFile(storageNode)) {
+                if (deleteFromFileIfNeeded(storageNode)) {
                     successfullyDeletedIds.add(storageNode.getId());
                 }
             });
@@ -54,7 +55,11 @@ public class DeleteMarkedNodesUseCase implements DeleteMarkedNodesInbound {
     // Implementation
     // =================================================================================================================
 
-    private boolean deleteFromFile(StorageNode storageNode) {
+    private boolean deleteFromFileIfNeeded(StorageNode storageNode) {
+        if (!FILE.equals(storageNode.getType())) {
+            return true;
+        }
+
         try {
             filesService.deleteFileByFileUuid(storageNode.getFileUuid());
             return true;

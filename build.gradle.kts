@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.bazar"
-version = "1.0.2"
+version = "1.0.3"
 description = "bazar-storage"
 
 java {
@@ -57,7 +57,7 @@ dependencies {
 
     //Security
     implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
-    implementation("org.bazar:bazar-authorization-sdk:1.0.1")
+    implementation("org.bazar:bazar-authorization-sdk:1.0.2")
 
     //Kafka
     implementation("org.springframework.boot:spring-boot-starter-kafka")

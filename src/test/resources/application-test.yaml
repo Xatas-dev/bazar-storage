@@ -2,7 +2,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
@@ -29,9 +29,16 @@ settings:
   file-validation:
     max-file-size: 52428800
     not-allowed-extensions: [exe, sh, bat, msi, bin, ps1, hta]
-    max-file-name-length: 100
+    max-node-name-length: 100
   schedule:
     delete-marked-files:
       cron: "0 */10 * * * *"
       batch-size: 2
       retention-days: 0
+
+logging:
+  level:
+    com.github.tomakehurst.wiremock: DEBUG
+    org.wiremock: DEBUG
+    feign: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE

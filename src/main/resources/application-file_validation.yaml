@@ -3,5 +3,8 @@ settings:
     error-messages:
       FILE_TOO_LARGE: "Размер файла не может превышать %d МБ"
       FILE_EXTENSION_NOT_ALLOWED: "Невозможно загрузить файл с таким расширением"
-      FILE_NAME_TOO_LARGE: "Длина имени файла не может превышать %d символов"
+      NODE_NAME_TOO_LONG: "Длина имени файла не может превышать %d символов"
+      PARENT_NODE_WRONG_TYPE: "Родительский узел имеет некорретный тип"
+      PARENT_NODE_WRONG_SPACE: "Родительский узел находится в другом пространстве"
+      PARENT_NODE_WRONG_STATUS: "Родительский узел в неверном статусе"
       UNKNOWN_ERROR: "Невозможно загрузить файл. Попробуйте позже"

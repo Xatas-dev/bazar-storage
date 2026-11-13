@@ -1,24 +1,34 @@
 package org.bazar.bazarstorage.app.api.node;
 
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
-import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface StorageNodeRepository {
     void save(StorageNode storageNode);
 
     Optional<StorageNode> findByFileUuid(String fileUuid);
 
-    Page<StorageNode> findBySpaceIdAndStatus(Long spaceId, StorageNodeStatus status, Pageable pageable);
+    Page<StorageNode> findActiveNodes(Long spaceId, Long parentId, Pageable pageable);
+
+    Optional<StorageNode> findActiveNode(Long spaceId, Long nodeId);
+
+    boolean existsInParentChain(Long spaceId, Long nodeId, Long parentId);
 
     Optional<StorageNode> findById(Long nodeId);
 
     List<StorageNode> findDeletedNodesAfterIdWithRetention(Long lastId, Instant retentionThreshold, Integer batchSize);
 
     void deleteAllByIds(List<Long> ids);
+
+    int updateFileUuid(Long nodeId, UUID fileUuid);
+
+    List<StorageNode> findAllDescendants(Long nodeId);
+
+    void lockSpace(Long spaceId);
 }

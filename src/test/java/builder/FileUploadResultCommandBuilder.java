@@ -11,7 +11,7 @@ public class FileUploadResultCommandBuilder {
     public String DEFAULT_DOMAIN = "STORAGE";
     public Long DEFAULT_SIZE = 150L;
     public String DEFAULT_FILE_UUID = "813e043f-b7ce-45d6-8b7d-a2873d70a515";
-    public String DEFAULT_FILE_NAME = "fileName";
+    public String DEFAULT_FILE_NAME = "name";
     public String DEFAULT_CONTENT_TYPE = "text/plain";
     public FileUploadStatus DEFAULT_STATUS = FileUploadStatus.UPLOADED;
     public String DEFAULT_ERROR_DESCRIPTION = "description";

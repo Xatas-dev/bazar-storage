@@ -8,12 +8,11 @@ import org.bazar.bazarstorage.app.api.node.StorageNodeMapper;
 import org.bazar.bazarstorage.app.api.node.StorageNodeRepository;
 import org.bazar.bazarstorage.app.api.node.commands.FileUploadResultCommand;
 import org.bazar.bazarstorage.app.api.node.commands.FileUploadStatus;
-import org.bazar.bazarstorage.app.api.validator.StorageNodeValidator;
-import org.bazar.bazarstorage.app.impl.helper.FilesHelper;
 import org.bazar.bazarstorage.app.impl.helper.StorageNodeStatusChanger;
+import org.bazar.bazarstorage.app.impl.validator.UploadedFileValidator;
 import org.bazar.bazarstorage.domain.storagenode.StorageNode;
 import org.bazar.bazarstorage.domain.storagenode.StorageNodeError;
-import org.bazar.bazarstorage.domain.storagenode.StorageNodeStatus;
+import org.bazar.bazarstorage.domain.storagenode.StorageNodeUploadStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -27,16 +26,16 @@ import static org.bazar.bazarstorage.app.api.exception.ErrorCode.STORAGE_NODE_NO
 @Component
 @RequiredArgsConstructor
 public class ProcessFileUploadedResultUseCase implements ProcessFileUploadedResultInbound {
-    private static final Map<FileUploadStatus, StorageNodeStatus> STATUS_MAPPING = Map.of(
-            FileUploadStatus.UPLOADED, StorageNodeStatus.UPLOADED,
-            FileUploadStatus.ERROR, StorageNodeStatus.ERROR,
-            FileUploadStatus.VALIDATION_ERROR, StorageNodeStatus.ERROR
+    private static final Map<FileUploadStatus, StorageNodeUploadStatus> STATUS_MAPPING = Map.of(
+            FileUploadStatus.UPLOADED, StorageNodeUploadStatus.UPLOADED,
+            FileUploadStatus.ERROR, StorageNodeUploadStatus.ERROR,
+            FileUploadStatus.VALIDATION_ERROR, StorageNodeUploadStatus.ERROR
     );
 
     private final StorageNodeRepository storageNodeRepository;
     private final StorageNodeStatusChanger statusChanger;
     private final StorageNodeMapper storageNodeMapper;
-    private final StorageNodeValidator storageNodeValidator;
+    private final UploadedFileValidator uploadedFileValidator;
 
     @Override
     @Transactional
@@ -48,9 +47,9 @@ public class ProcessFileUploadedResultUseCase implements ProcessFileUploadedResu
 
         if (!errors.isEmpty()) {
             storageNode.setErrors(errors);
-            statusChanger.changeStatus(storageNode, StorageNodeStatus.ERROR);
+            statusChanger.changeUploadStatus(storageNode, StorageNodeUploadStatus.ERROR);
         } else {
-            statusChanger.changeStatus(storageNode, STATUS_MAPPING.get(command.status()));
+            statusChanger.changeUploadStatus(storageNode, STATUS_MAPPING.get(command.status()));
         }
     }
 
@@ -72,8 +71,7 @@ public class ProcessFileUploadedResultUseCase implements ProcessFileUploadedResu
         if (FileUploadStatus.VALIDATION_ERROR.equals(command.status())) {
             return generateNodeErrors(command);
         }
-        return storageNodeValidator.validate(storageNodeMapper.toFileValidationRequest(command,
-                FilesHelper.getExtensionFromContentType(command.contentType())));
+        return uploadedFileValidator.validate(command);
     }
 
     private List<StorageNodeError> generateNodeErrors(FileUploadResultCommand command) {
