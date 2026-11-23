@@ -1,8 +1,8 @@
 package org.bazar.bazarstorage.app.api.node.output;
 
 public record AuthorInfo(
-        String firstName,
-        String lastName,
+        String displayName,
+        String avatarUrl,
         AuthorStatus status
 ) {
 }

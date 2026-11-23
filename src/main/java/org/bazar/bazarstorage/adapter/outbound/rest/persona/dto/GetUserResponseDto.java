@@ -5,12 +5,10 @@ import java.util.UUID;
 
 public record GetUserResponseDto(
         UUID id,
+        String username,
+        String displayName,
+        String avatarUrl,
         Instant createdAt,
-        Instant updatedAt,
-        String userName,
-        String email,
-        String firstName,
-        String lastName,
-        String userPic
+        Instant updatedAt
 ) {
 }
