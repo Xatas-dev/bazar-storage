@@ -11,6 +11,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class User {
     private UUID userId;
-    private String firstName;
-    private String lastName;
+    private String displayName;
+    private String avatarUrl;
 }
