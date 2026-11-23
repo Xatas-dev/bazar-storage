@@ -14,11 +14,13 @@ spring:
           issuer-uri: ${INTEGRATION_KEYCLOAK_EXTERNAL_URL}/realms/${INTEGRATION_KEYCLOAK_REALM}
   kafka:
     bootstrap-servers: ${INTEGRATION_KAFKA_BOOTSTRAP_SERVERS}
-    consumer:
-      group-id: group
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    security:
+      protocol: ${KAFKA_SECURITY_PROTOCOL:SASL_PLAINTEXT}
+    properties:
+      sasl:
+        mechanism: ${KAFKA_SASL_MECHANISM:PLAIN}
+        jaas:
+          config: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_USERNAME}" password="${KAFKA_PASSWORD}";'
 
 management:
   server:
