@@ -32,7 +32,7 @@ server:
 kafka:
   file-events:
     topic: file.events
-    group-id: space-events-group
+    group-id: file.events.bazar-storage
 
 service:
   bazar-files:

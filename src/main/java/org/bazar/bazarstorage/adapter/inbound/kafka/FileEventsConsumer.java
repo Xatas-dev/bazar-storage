@@ -18,7 +18,7 @@ public class FileEventsConsumer {
     private final ObjectMapper mapper;
     private final ProcessFileUploadedResultInbound processFileUploadedResultInbound;
 
-    @KafkaListener(topics = "${kafka.file-events.topic}")
+    @KafkaListener(topics = "${kafka.file-events.topic}", groupId = "${kafka.file-events.group-id}")
     public void accept(String message) {
         log.info("Received message: {} in [file-events] topic", message);
         FileUploadResultCommand command = mapper.readValue(message, FileUploadResultCommand.class);
