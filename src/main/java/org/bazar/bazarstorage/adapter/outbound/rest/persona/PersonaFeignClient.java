@@ -9,6 +9,6 @@ import java.util.List;
 
 @FeignClient(name = "bazar-persona", url = "${service.bazar-persona.url}")
 public interface PersonaFeignClient {
-    @GetMapping(value = "/users")
+    @GetMapping(value = "/v2/users")
     List<GetUserResponseDto> getUsers(@RequestParam("ids") List<String> ids);
 }
